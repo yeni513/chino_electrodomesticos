@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-white text-brand-ink font-sans;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  ::selection {
+    @apply bg-brand-accent/30 text-brand-ink;
+  }
+
+  h1, h2, h3 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  /* Hero — más presencia en desktop */
+  .heading-hero {
+    font-size: clamp(2.5rem, 5.5vw + 1rem, 5.75rem);
+    line-height: 1.02;
+    letter-spacing: -0.028em;
+  }
+
+  /* Secciones — más impacto sin exagerar */
+  .heading-section {
+    font-size: clamp(1.875rem, 3.2vw + 1rem, 3.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+
+  /* CTA final — el más grande de la página */
+  .heading-cta {
+    font-size: clamp(2rem, 4vw + 1rem, 4.25rem);
+    line-height: 1.04;
+    letter-spacing: -0.024em;
+  }
+
+  /* Ritmo vertical uniforme entre secciones */
+  .section-y {
+    @apply py-16 md:py-20 lg:py-24;
+  }
+
+  .mesh-bg {
+    background:
+      radial-gradient(at 20% 20%, rgba(245, 158, 11, 0.18) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, rgba(15, 23, 42, 0.08) 0px, transparent 50%),
+      radial-gradient(at 70% 80%, rgba(245, 158, 11, 0.12) 0px, transparent 50%),
+      linear-gradient(180deg, #FAF7F2 0%, #ffffff 100%);
+  }
+}
