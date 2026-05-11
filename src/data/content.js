@@ -1,14 +1,35 @@
-// Único punto de edición de contenido para el cliente.
+// ─────────────────────────────────────────────────────────────────────────────
+//  Chino Electrodomésticos · Guía rápida para el cliente
+// ─────────────────────────────────────────────────────────────────────────────
 //
-// Antes de publicar, reemplaza los siguientes campos con datos reales:
-//   business.phone        — número de teléfono visible (texto)
-//   business.whatsapp     — número internacional sin "+" para wa.me (solo dígitos)
-//   business.email        — correo de contacto
-//   business.address      — dirección física de la tienda
-//   business.hours        — horario real
-//   destacados[i].price   — precio real de cada producto
-//   testimonios[i].name   — nombre real del cliente (opcional)
-//   faqs[4].a             — dirección dentro de la respuesta
+//  Todo el contenido editable de la web vive en este archivo.
+//
+//  1. DATOS DE CONTACTO  → business
+//      - phone     : número visible (ej. "+34 600 000 000")
+//      - whatsapp  : número internacional sin "+" para wa.me (solo dígitos)
+//      - email     : correo de contacto
+//      - address   : dirección física
+//      - hours     : horario de atención
+//
+//  2. PRODUCTOS DESTACADOS  → destacados[]
+//      - name      : nombre del modelo
+//      - spec      : ficha técnica corta (capacidad · clase · etc.)
+//      - detail    : detalle secundario (voltaje, programas, materiales)
+//      - price     : "Consultar precio" o el precio real ("$ 1.250.000")
+//      - badge     : etiqueta superior (Más vendido / Recomendado / Nuevo…)
+//      - image     : ruta a la foto del producto (opcional)
+//                    Coloca la imagen en /public/products/ y pon aquí
+//                    "/products/refrigerador-320l.jpg"
+//      - chips     : pills de estado bajo la ficha
+//
+//  3. TESTIMONIOS  → testimonios[]
+//      Cuando el cliente apruebe nombres reales, completar campo "name".
+//      Si "name" está vacío, solo se muestra el rol y un avatar neutro.
+//
+//  4. CATEGORÍAS, MARCAS, FAQ  → arrays homónimos
+//
+//  Cualquier cambio aquí se refleja en toda la web sin tocar JSX.
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const business = {
   name: 'Chino Electrodomésticos',
@@ -31,11 +52,11 @@ export const hero = {
   eyebrow: 'Tienda local · Atención personalizada',
   headline: 'Refrigeradores, lavadoras, secadoras y estufas para tu hogar',
   subhead:
-    'Equipos revisados antes de entregártelos, asesoría directa por WhatsApp y precios claros. La atención de la tienda del barrio, sin call center.',
+    'Atención directa por WhatsApp, asesoría sin presión y opciones según inventario. La cercanía de la tienda del barrio, sin call center.',
   primaryCta: { label: 'Ver electrodomésticos', href: '#destacados' },
   secondaryCta: { label: 'Ver opciones por WhatsApp', href: 'whatsapp-direct' },
   microcopy:
-    'Pídenos fotos, precios y stock real por WhatsApp — te respondemos en minutos.',
+    'Pídenos fotos, precios y disponibilidad por WhatsApp — te respondemos lo antes posible.',
   categoryChips: [
     { icon: 'Refrigerator', label: 'Refrigeradores' },
     { icon: 'WashingMachine', label: 'Lavadoras' },
@@ -43,9 +64,9 @@ export const hero = {
     { icon: 'Flame', label: 'Estufas' },
   ],
   trustBullets: [
-    'Equipos revisados antes de salir',
-    'Entrega a domicilio coordinada',
     'Atención directa por WhatsApp',
+    'Opciones según inventario',
+    'Asesoría sin compromiso',
   ],
   applianceCards: [
     {
@@ -91,7 +112,7 @@ export const categorias = [
     id: 'lavadoras',
     icon: 'WashingMachine',
     label: 'Lavadoras',
-    description: 'Carga frontal y superior, de 7 a 20 kg.',
+    description: 'Carga frontal y superior, distintas capacidades.',
     cta: 'Preguntar disponibilidad',
   },
   {
@@ -112,7 +133,7 @@ export const categorias = [
     id: 'climatizacion',
     icon: 'Wind',
     label: 'Aire acondicionado',
-    description: 'Split, portátil e inverter para tu metraje.',
+    description: 'Split, portátil e inverter según tu metraje.',
     cta: 'Preguntar disponibilidad',
   },
   {
@@ -125,36 +146,36 @@ export const categorias = [
 ]
 
 export const categoriasFootnote =
-  '¿No ves el modelo exacto? Pídenos fotos y precios por WhatsApp — te enviamos opciones reales según tu presupuesto.'
+  '¿No ves el modelo exacto? Pídenos fotos y precios por WhatsApp — te enviamos opciones según inventario y tu presupuesto.'
 
 export const porQue = [
   {
     icon: 'Handshake',
     title: 'Te atendemos nosotros, no un call center',
-    body: 'Hablas con la misma persona que te vende, te entrega y te ayuda si algo no funciona. Sin tickets ni esperas.',
+    body: 'Hablas con la misma persona que te asesora y te entrega. Sin tickets ni esperas, sin guiones automáticos.',
   },
   {
     icon: 'CheckCircle2',
-    title: 'Probamos el equipo antes de entregártelo',
-    body: 'Revisamos cada electrodoméstico en tienda. Si tiene un golpe, una abolladura o no enciende, no sale por la puerta.',
+    title: 'Revisamos el equipo antes de entregártelo',
+    body: 'Cada electrodoméstico pasa por una revisión visual y de encendido antes de salir de la tienda. Si detectamos algún defecto, no se entrega.',
   },
   {
     icon: 'Truck',
-    title: 'Te lo llevamos hasta tu casa',
-    body: 'Coordinamos la entrega contigo según tu zona y horario. Llegamos cuando dijimos que íbamos a llegar.',
+    title: 'Entrega coordinada hasta tu casa',
+    body: 'Coordinamos contigo la zona, el día y la franja horaria. Te confirmamos por WhatsApp antes de salir.',
   },
   {
     icon: 'BadgeDollarSign',
-    title: 'Precios competitivos, sin sorpresas',
-    body: 'El precio que ves es el precio final. Sin cargos ocultos, sin garantías “premium” que en realidad ya vienen de fábrica.',
+    title: 'Precios claros, sin cargos ocultos',
+    body: 'El precio que te pasamos por WhatsApp es el precio final del equipo. Sin extras escondidos ni garantías "premium" innecesarias.',
   },
 ]
 
 export const destacadosIntro = {
   eyebrow: 'Destacados',
-  headline: 'Los modelos que más nos consultan esta semana',
+  headline: 'Algunos de los modelos que más nos consultan',
   subhead:
-    'Una muestra de lo que tenemos hoy en tienda. Pídenos fotos, vídeo o el precio actualizado por WhatsApp antes de venir.',
+    'Una muestra del catálogo. Pídenos fotos, vídeo o el precio actualizado por WhatsApp antes de venir — el inventario cambia.',
 }
 
 export const destacados = [
@@ -165,10 +186,11 @@ export const destacados = [
     detail: '220 V · dispensador interior · congelador superior',
     price: 'Consultar precio',
     badge: 'Más consultado',
+    image: null, // coloca la foto en /public/products/ y referénciala aquí
     chips: [
       { icon: 'CheckCircle2', label: 'Disponible', tone: 'success' },
       { icon: 'PackageCheck', label: 'Revisado', tone: 'neutral' },
-      { icon: 'Truck', label: 'Listo para entrega', tone: 'neutral' },
+      { icon: 'Truck', label: 'Entrega coordinada', tone: 'neutral' },
     ],
   },
   {
@@ -178,10 +200,11 @@ export const destacados = [
     detail: 'Motor inverter · vapor · clase A',
     price: 'Consultar precio',
     badge: 'Recomendado',
+    image: null,
     chips: [
       { icon: 'CheckCircle2', label: 'Disponible', tone: 'success' },
       { icon: 'PackageCheck', label: 'Revisado', tone: 'neutral' },
-      { icon: 'Truck', label: 'Listo para entrega', tone: 'neutral' },
+      { icon: 'Truck', label: 'Entrega coordinada', tone: 'neutral' },
     ],
   },
   {
@@ -191,8 +214,9 @@ export const destacados = [
     detail: 'Antiarrugas · sensor de humedad · panel táctil',
     price: 'Consultar precio',
     badge: 'Nuevo modelo',
+    image: null,
     chips: [
-      { icon: 'Clock3', label: 'Consultar stock', tone: 'warning' },
+      { icon: 'Clock3', label: 'Consultar disponibilidad', tone: 'warning' },
       { icon: 'PackageCheck', label: 'Revisado', tone: 'neutral' },
     ],
   },
@@ -203,10 +227,11 @@ export const destacados = [
     detail: 'Horno 65 L · encendido eléctrico · acero inoxidable',
     price: 'Consultar precio',
     badge: 'Más vendido',
+    image: null,
     chips: [
       { icon: 'CheckCircle2', label: 'Disponible', tone: 'success' },
       { icon: 'PackageCheck', label: 'Revisado', tone: 'neutral' },
-      { icon: 'Truck', label: 'Listo para entrega', tone: 'neutral' },
+      { icon: 'Truck', label: 'Entrega coordinada', tone: 'neutral' },
     ],
   },
 ]
@@ -231,13 +256,13 @@ export const testimonios = [
   },
   {
     quote:
-      'Pregunté por WhatsApp y me respondieron en minutos. Cuando llegó el refrigerador, lo probaron delante de mí antes de irse. Esa tranquilidad no la encuentras en una cadena grande.',
+      'Pregunté por WhatsApp y me respondieron rápido. Cuando llegó el refrigerador, lo revisaron delante de mí. Esa cercanía no la encuentras en una cadena grande.',
     name: '',
     role: 'Compra reciente',
   },
   {
     quote:
-      'Llevo años comprándoles. Si algo se daña, los conozco, sé dónde están y me ayudan. Para mí eso vale más que cualquier descuento agresivo.',
+      'Llevo tiempo comprándoles. Si algo necesita atención, los conozco, sé dónde están y me ayudan. Para mí eso vale más que cualquier descuento agresivo.',
     name: '',
     role: 'Cliente frecuente',
   },
@@ -246,23 +271,23 @@ export const testimonios = [
 export const faqs = [
   {
     q: '¿Puedo pedir fotos y precios antes de ir a la tienda?',
-    a: 'Sí. Escríbenos por WhatsApp diciéndonos qué buscas y te enviamos fotos reales del equipo en stock, precio final y opciones similares para que decidas con calma.',
+    a: 'Sí. Escríbenos por WhatsApp diciéndonos qué buscas y te enviamos fotos del equipo, precio actualizado y opciones similares según disponibilidad.',
   },
   {
     q: '¿Hacen entrega a domicilio?',
-    a: 'Sí, coordinamos la entrega contigo según tu zona y horario. Te confirmamos por WhatsApp el día y la franja antes de salir.',
+    a: 'Tenemos entrega coordinada según tu zona y horario. Te confirmamos por WhatsApp el día y la franja antes de salir. Consúltanos para tu caso.',
   },
   {
-    q: '¿Los electrodomésticos son nuevos y con garantía?',
-    a: 'Sí, todos los equipos son nuevos y vienen con la garantía oficial de fábrica. Antes de entregarlos los revisamos en tienda para evitarte sorpresas.',
+    q: '¿Los electrodomésticos son nuevos?',
+    a: 'Sí, todos los equipos son nuevos y traen la garantía oficial de fábrica del fabricante. Antes de entregarlos pasamos una revisión visual y de encendido.',
   },
   {
     q: '¿Qué pasa si el equipo presenta una falla?',
-    a: 'Te ayudamos con la gestión del servicio técnico oficial de la marca. Si la falla es de fábrica al recibirlo, lo cambiamos.',
+    a: 'Te ayudamos con la gestión del servicio técnico oficial de la marca. Pregúntanos por WhatsApp y te indicamos cómo procedemos según el caso.',
   },
   {
     q: '¿Cómo puedo pagar?',
-    a: 'Aceptamos efectivo, tarjeta y transferencia. Pregúntanos por las opciones de pago en cuotas disponibles según el equipo.',
+    a: 'Aceptamos efectivo, tarjeta y transferencia. Pregúntanos por las opciones de pago disponibles para cada equipo.',
   },
   {
     q: '¿Tienen tienda física donde pueda ver los equipos?',
@@ -274,13 +299,13 @@ export const ctaFinal = {
   eyebrow: 'Atención directa, sin formularios',
   headline: '¿Buscas lavadora, secadora, estufa o refrigerador?',
   subhead:
-    'Escríbenos y te mostramos las opciones disponibles hoy. Fotos, precios y stock real por WhatsApp — sin compromiso.',
+    'Escríbenos y te mostramos las opciones según inventario. Fotos, precios y disponibilidad por WhatsApp — sin compromiso.',
   primaryCta: { label: 'Preguntar por WhatsApp', href: 'whatsapp-direct' },
   secondaryCta: { label: 'Llamar a la tienda', href: 'phone-direct' },
   reassurance: [
-    'Respondemos en horario de tienda',
+    'Te respondemos en horario de tienda',
     'Te enviamos fotos y precios reales',
     'Sin call center ni respuestas automáticas',
   ],
-  reassuranceUnderCta: 'Respuesta en minutos · sin compromiso',
+  reassuranceUnderCta: 'Respuesta rápida · sin compromiso',
 }

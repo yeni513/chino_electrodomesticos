@@ -63,24 +63,34 @@ export default function Destacados() {
                 key={p.id}
                 className="group flex flex-col rounded-card bg-white ring-1 ring-slate-200 hover:ring-slate-300 hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-smooth overflow-hidden"
               >
-                {/* Visual — imagen placeholder más grande */}
+                {/* Visual — foto real o placeholder con icono */}
                 <div className="relative aspect-[4/3] bg-gradient-to-br from-slate-100 via-white to-brand-cream overflow-hidden">
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 opacity-70"
-                    style={{
-                      backgroundImage:
-                        'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.85), transparent 60%)',
-                    }}
-                  />
-                  {/* Plataforma sutil bajo el producto */}
-                  <div
-                    aria-hidden
-                    className="absolute inset-x-8 bottom-8 h-1.5 rounded-full bg-slate-200/70 blur-md"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center text-brand-ink/75 group-hover:scale-105 transition-transform duration-500 ease-smooth">
-                    <Icon className="w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40" strokeWidth={1.05} />
-                  </div>
+                  {p.image ? (
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-smooth"
+                    />
+                  ) : (
+                    <>
+                      <div
+                        aria-hidden
+                        className="absolute inset-0 opacity-70"
+                        style={{
+                          backgroundImage:
+                            'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.85), transparent 60%)',
+                        }}
+                      />
+                      <div
+                        aria-hidden
+                        className="absolute inset-x-8 bottom-8 h-1.5 rounded-full bg-slate-200/70 blur-md"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center text-brand-ink/75 group-hover:scale-105 transition-transform duration-500 ease-smooth">
+                        <Icon className="w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40" strokeWidth={1.05} />
+                      </div>
+                    </>
+                  )}
                   <div className="absolute top-4 left-4">
                     <Badge tone="ink">{p.badge}</Badge>
                   </div>

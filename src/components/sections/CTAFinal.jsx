@@ -115,7 +115,7 @@ export default function CTAFinal() {
                     </div>
                     <div className="bg-emerald-500/90 text-white rounded-lg rounded-tr-sm px-3.5 py-2.5 max-w-[85%] ml-auto">
                       <p className="text-xs leading-relaxed font-medium">
-                        ¡Hola! Te paso tres opciones que tenemos hoy en tienda con foto y precio.
+                        ¡Hola! Te paso varias opciones según inventario con foto y precio.
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-1.5 max-w-[85%] ml-auto justify-end">
