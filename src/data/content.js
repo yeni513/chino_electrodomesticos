@@ -34,8 +34,8 @@
 export const business = {
   name: 'Chino Electrodomésticos',
   tagline: 'Tu tienda de electrodomésticos del barrio',
-  phone: '',
-  whatsapp: '',
+  phone: '+1 (216) 278-4775',
+  whatsapp: '12162784775',
   email: '',
   address: 'Pregúntanos la dirección por WhatsApp',
   hours: 'Horario de tienda — consulta por WhatsApp',
