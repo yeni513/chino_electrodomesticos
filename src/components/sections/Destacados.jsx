@@ -144,10 +144,10 @@ export default function Destacados() {
                     className="mt-5 inline-flex items-center justify-center gap-2 w-full min-h-[52px] px-5 py-3.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm md:text-base font-semibold shadow-soft hover:shadow-lift transition-all duration-200 ease-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2"
                   >
                     <MessageCircle className="w-4 h-4 md:w-5 md:h-5" />
-                    Preguntar por este
+                    Preguntar por este equipo
                   </a>
                   <p className="mt-2.5 text-[11px] md:text-xs text-center text-slate-400">
-                    Te enviamos fotos y precio actualizado
+                    Te enviamos fotos y precio por WhatsApp
                   </p>
                 </div>
               </article>

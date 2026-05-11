@@ -118,10 +118,13 @@ function HeroVisual() {
       <div className="absolute inset-5 md:inset-6 lg:inset-7 grid grid-cols-2 grid-rows-2 gap-3.5 md:gap-4 lg:gap-5">
         {hero.applianceCards.map((item, i) => {
           const Icon = ICONS[item.icon]
+          const msg = `Hola, quiero ver precios y disponibilidad de ${item.label.toLowerCase()}.`
           return (
             <a
               key={item.label}
-              href="#destacados"
+              href={whatsappUrl(msg)}
+              target="_blank"
+              rel="noopener noreferrer"
               className={[
                 'group relative flex flex-col p-4 md:p-5 lg:p-6 rounded-xl bg-white',
                 'shadow-soft ring-1 ring-slate-200/70',
