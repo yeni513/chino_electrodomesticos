@@ -1,6 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="8" fill="#0F172A"/>
-  <path d="M9 10h14v12a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V10Z" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round"/>
-  <circle cx="16" cy="17" r="3" fill="none" stroke="#F59E0B" stroke-width="2"/>
-  <line x1="9" y1="13" x2="23" y2="13" stroke="#F59E0B" stroke-width="2"/>
+  <rect width="32" height="32" rx="6" fill="#1F3D63"/>
+  <!-- Refrigerator -->
+  <rect x="18" y="7" width="9" height="19" rx="1.2" fill="#ffffff"/>
+  <rect x="18" y="14" width="9" height="0.7" fill="#1F3D63"/>
+  <!-- Washer with drum -->
+  <rect x="5" y="11" width="12" height="15" rx="1.2" fill="#ffffff"/>
+  <circle cx="11" cy="20" r="4" fill="#1F3D63"/>
+  <circle cx="11" cy="20" r="1.8" fill="#ffffff"/>
 </svg>

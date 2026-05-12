@@ -1,6 +1,6 @@
 import { Phone, MessageCircle, MapPin, Clock, Mail } from 'lucide-react'
 import Container from './Container.jsx'
-import { business, nav } from '../../data/content.js'
+import { brand, business, nav } from '../../data/content.js'
 import { whatsappUrl, telUrl, hasPhone, hasEmail } from '../../lib/whatsapp.js'
 
 export default function Footer() {
@@ -8,13 +8,12 @@ export default function Footer() {
     <footer className="bg-brand-ink text-slate-300">
       <Container className="py-16 grid gap-12 md:grid-cols-12">
         <div className="md:col-span-5">
-          <div className="flex items-center gap-2.5">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-accent text-brand-ink font-display font-bold">
-              C
-            </span>
-            <span className="font-display font-semibold text-lg text-white tracking-tight">
-              {business.name}
-            </span>
+          <div className="inline-flex items-center bg-white rounded-lg px-5 py-4 ring-1 ring-white/10 shadow-soft">
+            <img
+              src={brand.assets.logo}
+              alt={business.name}
+              className="h-14 md:h-16 w-auto object-contain"
+            />
           </div>
           <p className="mt-4 text-sm leading-relaxed max-w-sm">
             {business.tagline}. Entrega coordinada, equipos revisados antes de salir y asesoría directa por WhatsApp.

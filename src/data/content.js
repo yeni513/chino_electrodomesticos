@@ -1,39 +1,58 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  Chino Electrodomésticos · Guía rápida para el cliente
+//  Trusted Appliances · Configuración central de la web
 // ─────────────────────────────────────────────────────────────────────────────
 //
-//  Todo el contenido editable de la web vive en este archivo.
+//  Este archivo es la fuente única de marca, contacto y copy. Cambiando algo
+//  aquí, se actualiza toda la web (header, footer, panel admin, SEO, etc.).
 //
-//  1. DATOS DE CONTACTO  → business
-//      - phone     : número visible (ej. "+34 600 000 000")
-//      - whatsapp  : número internacional sin "+" para wa.me (solo dígitos)
-//      - email     : correo de contacto
-//      - address   : dirección física
-//      - hours     : horario de atención
+//  Áreas:
+//   · brand     → identidad visual y SEO
+//   · business  → datos de contacto (en su mayoría vienen también de Supabase
+//                 a través del panel admin)
+//   · hero / categorias / porQue / destacados / ctaFinal / faqs / testimonios
+//                 → copy de cada sección de la web pública
 //
-//  2. PRODUCTOS DESTACADOS  → destacados[]
-//      - name      : nombre del modelo
-//      - spec      : ficha técnica corta (capacidad · clase · etc.)
-//      - detail    : detalle secundario (voltaje, programas, materiales)
-//      - price     : "Consultar precio" o el precio real ("$ 1.250.000")
-//      - badge     : etiqueta superior (Más vendido / Recomendado / Nuevo…)
-//      - image     : ruta a la foto del producto (opcional)
-//                    Coloca la imagen en /public/products/ y pon aquí
-//                    "/products/refrigerador-320l.jpg"
-//      - chips     : pills de estado bajo la ficha
-//
-//  3. TESTIMONIOS  → testimonios[]
-//      Cuando el cliente apruebe nombres reales, completar campo "name".
-//      Si "name" está vacío, solo se muestra el rol y un avatar neutro.
-//
-//  4. CATEGORÍAS, MARCAS, FAQ  → arrays homónimos
-//
-//  Cualquier cambio aquí se refleja en toda la web sin tocar JSX.
+//  Los productos del catálogo NO viven aquí: se gestionan desde el panel
+//  admin (/admin/dashboard) y se guardan en Supabase. Los productos del
+//  bloque "Destacados" son solo un fallback visual mientras el inventario
+//  esté vacío.
 // ─────────────────────────────────────────────────────────────────────────────
 
+export const brand = {
+  name: 'Trusted Appliances',
+  shortName: 'Trusted Appliances',
+  tagline: 'Electrodomésticos confiables para tu hogar',
+  assets: {
+    // Logo oficial recortado (sin whitespace). Se usa en header, footer, login y admin.
+    logo: '/logo-trusted-appliances-cropped.png',
+    // Versión original con whitespace alrededor. Útil para OG image y social previews.
+    logoFull: '/logo-trusted-appliances.png',
+    // Favicon simplificado (32×32 para la pestaña del navegador).
+    favicon: '/favicon.svg',
+  },
+  // Estos valores son de referencia. Los HEX reales viven en tailwind.config.js.
+  colors: {
+    navy: '#1F3D63',
+    navySoft: '#2B5184',
+    accent: '#C9A227',
+    cream: '#F8FAFC',
+  },
+}
+
+export const seo = {
+  title: 'Trusted Appliances · Refrigeradores, lavadoras, secadoras y estufas',
+  description:
+    'Trusted Appliances ofrece refrigeradores, lavadoras, secadoras, estufas y más. Consulta inventario disponible y precios actuales por WhatsApp.',
+  ogTitle: 'Trusted Appliances · Electrodomésticos confiables para tu hogar',
+  ogDescription:
+    'Refrigeradores, lavadoras, secadoras, estufas y más. Pregúntanos por inventario disponible, fotos y precios por WhatsApp.',
+  locale: 'es_US',
+  siteName: 'Trusted Appliances',
+}
+
 export const business = {
-  name: 'Chino Electrodomésticos',
-  tagline: 'Tu tienda de electrodomésticos del barrio',
+  name: brand.name,
+  tagline: brand.tagline,
   phone: '+1 (216) 278-4775',
   whatsapp: '12162784775',
   email: '',
@@ -49,10 +68,10 @@ export const nav = [
 ]
 
 export const hero = {
-  eyebrow: 'Tienda local · Atención personalizada',
-  headline: 'Refrigeradores, lavadoras, secadoras y estufas para tu hogar',
+  eyebrow: 'Trusted Appliances · Atención personalizada',
+  headline: 'Electrodomésticos confiables para tu hogar',
   subhead:
-    'Atención directa por WhatsApp, asesoría sin presión y opciones según inventario. La cercanía de la tienda del barrio, sin call center.',
+    'Refrigeradores, lavadoras, secadoras y estufas revisados antes de entregarte. Asesoría directa por WhatsApp y precios claros — sin call center.',
   primaryCta: { label: 'Ver electrodomésticos', href: '#destacados' },
   secondaryCta: { label: 'Ver opciones por WhatsApp', href: 'whatsapp-direct' },
   microcopy:
@@ -157,7 +176,7 @@ export const porQue = [
   {
     icon: 'CheckCircle2',
     title: 'Revisamos el equipo antes de entregártelo',
-    body: 'Cada electrodoméstico pasa por una revisión visual y de encendido antes de salir de la tienda. Si detectamos algún defecto, no se entrega.',
+    body: 'Cada electrodoméstico pasa por una revisión visual y de encendido antes de salir. Si detectamos un defecto, no se entrega.',
   },
   {
     icon: 'Truck',
@@ -167,7 +186,7 @@ export const porQue = [
   {
     icon: 'BadgeDollarSign',
     title: 'Precios claros, sin cargos ocultos',
-    body: 'El precio que te pasamos por WhatsApp es el precio final del equipo. Sin extras escondidos ni garantías "premium" innecesarias.',
+    body: 'El precio que te pasamos por WhatsApp es el precio final del equipo. Sin extras escondidos.',
   },
 ]
 
@@ -178,6 +197,7 @@ export const destacadosIntro = {
     'Una muestra del catálogo. Pídenos fotos, vídeo o el precio actualizado por WhatsApp antes de venir — el inventario cambia.',
 }
 
+// Fallback mostrado solo si la tabla de productos en Supabase está vacía.
 export const destacados = [
   {
     id: 1,
@@ -186,7 +206,7 @@ export const destacados = [
     detail: '220 V · dispensador interior · congelador superior',
     price: 'Consultar precio',
     badge: 'Más consultado',
-    image: null, // coloca la foto en /public/products/ y referénciala aquí
+    image: null,
     chips: [
       { icon: 'CheckCircle2', label: 'Disponible', tone: 'success' },
       { icon: 'PackageCheck', label: 'Revisado', tone: 'neutral' },
@@ -237,20 +257,20 @@ export const destacados = [
 ]
 
 export const marcas = [
-  'Mabe',
+  'Whirlpool',
   'Samsung',
   'LG',
-  'Whirlpool',
+  'GE',
+  'Frigidaire',
+  'Maytag',
   'Bosch',
-  'Indurama',
-  'Haceb',
-  'Electrolux',
+  'KitchenAid',
 ]
 
 export const testimonios = [
   {
     quote:
-      'Llegué buscando una lavadora y me explicaron las diferencias sin presión. Acabé llevándome la que de verdad encajaba con mi familia, no la más cara.',
+      'Llegué buscando una lavadora y me explicaron las diferencias sin presión. Me llevé la que de verdad encajaba con mi familia, no la más cara.',
     name: '',
     role: 'Cliente del barrio',
   },
@@ -262,7 +282,7 @@ export const testimonios = [
   },
   {
     quote:
-      'Llevo tiempo comprándoles. Si algo necesita atención, los conozco, sé dónde están y me ayudan. Para mí eso vale más que cualquier descuento agresivo.',
+      'Llevo tiempo comprándoles. Si algo necesita atención, sé dónde están y me ayudan. Eso vale más que cualquier descuento agresivo.',
     name: '',
     role: 'Cliente frecuente',
   },
@@ -291,7 +311,7 @@ export const faqs = [
   },
   {
     q: '¿Tienen tienda física donde pueda ver los equipos?',
-    a: 'Sí. Escríbenos por WhatsApp y te enviamos la dirección y cómo llegar. Puedes venir a ver los equipos en exposición antes de decidir, sin compromiso.',
+    a: 'Sí. Escríbenos por WhatsApp y te enviamos la dirección y cómo llegar. Puedes ver los equipos en exposición antes de decidir, sin compromiso.',
   },
 ]
 

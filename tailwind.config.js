@@ -6,21 +6,25 @@ export default {
       fontFamily: {
         display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        brand: ['"Concert One"', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
         brand: {
-          ink: '#0F172A',
-          accent: '#F59E0B',
-          'accent-dark': '#B45309',
-          cream: '#FAF7F2',
+          // Trusted Appliances — paleta oficial
+          ink: '#1F3D63',          // navy principal (extraído del logo)
+          'ink-soft': '#2B5184',   // navy más claro para variaciones
+          accent: '#C9A227',       // dorado discreto (CTAs, detalles)
+          'accent-dark': '#8E7320',// dorado oscuro (hover)
+          cream: '#F8FAFC',        // off-white para fondos de sección
+          line: '#E2E8F0',         // gris suave para bordes
         },
       },
       maxWidth: {
         container: '1440px',
       },
       boxShadow: {
-        soft: '0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06)',
-        lift: '0 4px 8px rgba(15, 23, 42, 0.06), 0 24px 48px rgba(15, 23, 42, 0.10)',
+        soft: '0 1px 2px rgba(31, 61, 99, 0.04), 0 8px 24px rgba(31, 61, 99, 0.06)',
+        lift: '0 4px 8px rgba(31, 61, 99, 0.06), 0 24px 48px rgba(31, 61, 99, 0.10)',
       },
       borderRadius: {
         card: '12px',

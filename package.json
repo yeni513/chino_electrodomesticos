@@ -1,5 +1,5 @@
 {
-  "name": "chino-electrodomesticos",
+  "name": "trusted-appliances",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -9,9 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.105.4",
     "lucide-react": "^0.460.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.15.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

@@ -1,31 +1,43 @@
-import Header from './components/layout/Header.jsx'
-import Footer from './components/layout/Footer.jsx'
-import FloatingWhatsApp from './components/ui/FloatingWhatsApp.jsx'
-import Hero from './components/sections/Hero.jsx'
-import Categorias from './components/sections/Categorias.jsx'
-import PorQueNosotros from './components/sections/PorQueNosotros.jsx'
-import Destacados from './components/sections/Destacados.jsx'
-import Marcas from './components/sections/Marcas.jsx'
-import Testimonios from './components/sections/Testimonios.jsx'
-import FAQ from './components/sections/FAQ.jsx'
-import CTAFinal from './components/sections/CTAFinal.jsx'
+import { lazy, Suspense } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import PublicSite from './PublicSite.jsx'
+import ProtectedRoute from './admin/components/ProtectedRoute.jsx'
+
+const Login = lazy(() => import('./admin/pages/Login.jsx'))
+const Dashboard = lazy(() => import('./admin/pages/Dashboard.jsx'))
+
+function AdminLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <p className="text-sm text-slate-500">Cargando panel…</p>
+    </div>
+  )
+}
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1">
-        <Hero />
-        <Categorias />
-        <PorQueNosotros />
-        <Destacados />
-        <Marcas />
-        <Testimonios />
-        <FAQ />
-        <CTAFinal />
-      </main>
-      <Footer />
-      <FloatingWhatsApp />
-    </div>
+    <Routes>
+      <Route path="/" element={<PublicSite />} />
+      <Route
+        path="/admin/login"
+        element={
+          <Suspense fallback={<AdminLoader />}>
+            <Login />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={<AdminLoader />}>
+              <Dashboard />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }

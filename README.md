@@ -1,6 +1,6 @@
-# Chino Electrodomésticos — Landing Page
+# Trusted Appliances — Landing + Panel admin
 
-Landing premium para tienda de electrodomésticos. React 19 + Vite + Tailwind CSS v3.4.
+Web pública de catálogo + panel admin para gestionar inventario. React 19 + Vite + Tailwind CSS v3.4 + Supabase.
 
 ---
 
@@ -11,129 +11,120 @@ npm install
 npm run dev
 ```
 
-Abre `http://localhost:5173`.
+Abre `http://localhost:5173` (web pública) o `/admin` (panel admin).
 
 ## 🏗 Comandos
 
 | Comando | Qué hace |
 |---|---|
 | `npm run dev` | Servidor de desarrollo con recarga automática |
-| `npm run build` | Genera la versión de producción en `dist/` |
-| `npm run preview` | Sirve `dist/` localmente para revisarlo antes del deploy |
+| `npm run build` | Build de producción en `dist/` |
+| `npm run preview` | Sirve `dist/` localmente |
 
-## 🌐 Deploy
+## 🌐 Deploy en Vercel
 
-El proyecto ya está configurado para desplegarse en Vercel sin tocar nada. Cada push a la rama conectada genera un build automático.
+El proyecto incluye `vercel.json` para SPA routing. Variables de entorno necesarias en **Vercel → Settings → Environment Variables**:
+
+| Variable | Valor |
+|---|---|
+| `VITE_SUPABASE_URL` | URL del proyecto Supabase |
+| `VITE_SUPABASE_ANON_KEY` | Clave publicable (`sb_publishable_…`) |
 
 ---
 
-## ✏️ Editar el contenido (sin tocar código)
+## ✏️ Editar marca y contenido
 
-**Todo el texto, productos, contactos y preguntas viven en un solo archivo:**
+**Todo el branding y copy vive en un único archivo:**
 
 ```
 src/data/content.js
 ```
 
-Abre ese archivo en cualquier editor de texto. Tiene un comentario al principio explicando cada sección. Lo que edites ahí aparece automáticamente en toda la web.
+Contiene:
 
-### 1. Datos de contacto
+| Bloque | Para qué |
+|---|---|
+| `brand` | Nombre, tagline, rutas de logo, colores de referencia |
+| `seo` | Title, meta description, Open Graph |
+| `business` | Teléfono, WhatsApp, email, dirección, horario |
+| `hero` / `categorias` / `porQue` / etc. | Copy de cada sección de la web pública |
 
-En la sección `business`:
+### Cambiar el logo
+
+El logo oficial vive en un único archivo:
+
+- `public/logo-trusted-appliances.png` — logo oficial (navy sobre transparente)
+- `public/favicon.svg` — versión simplificada para la pestaña del navegador
+
+Para cambiar el logo, reemplaza ese PNG manteniendo el mismo nombre de archivo. El sitio entero recoge el nuevo logo al recargar (header, footer, login, panel admin, OG image).
+
+### Cambiar la paleta de colores
+
+Edita `tailwind.config.js`:
 
 ```js
-export const business = {
-  name: 'Chino Electrodomésticos',
-  tagline: 'Tu tienda de electrodomésticos del barrio',
-  phone: '',      // ← tu número visible, ej. "+34 600 123 456"
-  whatsapp: '',   // ← número internacional sin "+", ej. "34600123456"
-  email: '',      // ← correo opcional
-  address: '...',
-  hours: '...',
+colors: {
+  brand: {
+    ink: '#0B2545',      // navy principal
+    accent: '#C9A227',   // dorado discreto
+    cream: '#F8FAFC',    // off-white
+    // ...
+  }
 }
 ```
 
-Cuando completes `phone`, `whatsapp` y `email`, las filas correspondientes aparecen en el footer. Si los dejas vacíos, no se muestran.
+---
 
-### 2. Productos destacados
+## 📦 Productos del catálogo
 
-En el array `destacados`. Cada producto es un objeto:
+Los productos NO se editan en código. Se gestionan desde el panel admin (`/admin`) y se guardan en Supabase. Ver [README-ADMIN.md](./README-ADMIN.md).
 
-```js
-{
-  id: 1,
-  name: 'Refrigerador No Frost 320 L',
-  spec: 'Doble puerta · 320 L · clase A',
-  detail: '220 V · dispensador interior · congelador superior',
-  price: 'Consultar precio',       // o un precio real: '$ 1.250.000'
-  badge: 'Más consultado',
-  image: null,                     // o una ruta: '/products/refri-320l.webp'
-  chips: [
-    { icon: 'CheckCircle2', label: 'Disponible', tone: 'success' },
-    { icon: 'PackageCheck', label: 'Revisado', tone: 'neutral' },
-    { icon: 'Truck', label: 'Entrega coordinada', tone: 'neutral' },
-  ],
-}
-```
+### Configurar Supabase (primera vez)
 
-Tonos disponibles para `chips`: `success` (verde), `neutral` (gris), `warning` (ámbar).
-
-Para añadir o quitar productos, simplemente añade o borra objetos del array.
-
-### 3. Fotos de productos
-
-1. Coloca la foto en `public/products/` con un nombre claro (`refri-320l.webp`).
-2. En `content.js`, cambia `image: null` por `image: '/products/refri-320l.webp'`.
-3. La web la mostrará automáticamente en lugar del placeholder con icono.
-
-Ver `public/products/README.md` para detalles de formato y tamaño recomendado.
-
-### 4. Testimonios
-
-En `testimonios`. Cuando tengas nombres reales aprobados por los clientes, rellena el campo `name`. Mientras esté vacío, se muestra solo el rol con un avatar neutro — sin nombres inventados.
-
-### 5. Categorías, marcas y preguntas frecuentes
-
-Cada array (`categorias`, `marcas`, `faqs`) se edita igual: añade, modifica o quita entradas del array.
+1. En tu proyecto Supabase, abre **SQL Editor** y ejecuta `supabase-schema.sql` (crea tabla `products`, bucket `product-images` y políticas RLS).
+2. Crea el primer usuario admin en **Authentication → Users → Add user** (con "Auto Confirm User" activado).
+3. Desactiva **"Enable Sign Ups"** en Authentication → Providers → Email.
 
 ---
 
 ## 📁 Estructura
 
 ```
-chino_electrodomesticos/
+trusted-appliances/
 ├── public/
-│   ├── favicon.svg
-│   └── products/                ← fotos reales de productos
+│   ├── logo-trusted-appliances.png, favicon.svg
+│   └── products/                ← fotos (también pueden subirse desde el admin)
 ├── src/
-│   ├── data/
-│   │   └── content.js           ← TODO el contenido editable
+│   ├── data/content.js          ← branding, SEO, copy
 │   ├── components/
 │   │   ├── layout/              Header, Footer, Container
 │   │   ├── ui/                  Button, Badge, FloatingWhatsApp
 │   │   └── sections/            Hero, Categorias, Destacados, etc.
-│   ├── lib/
-│   │   └── whatsapp.js          helper de enlaces WhatsApp / teléfono
-│   ├── App.jsx                  compone las secciones
-│   ├── main.jsx                 entry point
-│   └── index.css                Tailwind + tipografía + tokens
-├── design-system.md             tokens visuales y reglas de marca
-├── tailwind.config.js
-├── vite.config.js
-└── package.json
+│   ├── admin/
+│   │   ├── pages/               Login, Dashboard
+│   │   └── components/          ProductList, ProductForm, ProductImageUpload
+│   ├── supabase/
+│   │   ├── client.js            cliente + validación de config
+│   │   ├── AuthContext.jsx      sesión
+│   │   └── useProducts.js       hooks de productos
+│   ├── lib/whatsapp.js          helper de enlaces
+│   ├── App.jsx                  router
+│   ├── PublicSite.jsx           landing pública
+│   └── main.jsx                 entry
+├── supabase-schema.sql          esquema Supabase
+├── README.md                    este archivo
+├── README-ADMIN.md              guía del panel para el cliente final
+└── design-system.md             tokens y reglas visuales
 ```
 
 ---
 
 ## 🎨 Sistema de diseño
 
-Si quieres cambiar colores, tipografía o radios:
-
-- Tokens en `tailwind.config.js` (sección `theme.extend`)
-- Documentación en `design-system.md`
+Ver [design-system.md](./design-system.md) para tokens, tipografía y reglas visuales.
 
 ---
 
 ## ❓ Soporte
 
-Si tienes dudas técnicas o necesitas un cambio mayor (nuevas secciones, lógica de carrito, integración con base de datos…), contacta al desarrollador.
+Si tienes dudas técnicas o necesitas un cambio mayor, contacta al desarrollador.

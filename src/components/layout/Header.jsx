@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Menu, X, MessageCircle } from 'lucide-react'
 import Container from './Container.jsx'
 import Button from '../ui/Button.jsx'
-import { business, nav } from '../../data/content.js'
+import { brand, business, nav } from '../../data/content.js'
 import { whatsappUrl } from '../../lib/whatsapp.js'
 
 export default function Header() {
@@ -32,14 +32,13 @@ export default function Header() {
           : 'bg-transparent border-b border-transparent',
       ].join(' ')}
     >
-      <Container className="flex items-center justify-between h-16 md:h-20">
-        <a href="#top" className="flex items-center gap-2.5 group">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-ink text-brand-accent font-display font-bold">
-            C
-          </span>
-          <span className="font-display font-semibold text-lg tracking-tight">
-            {business.name}
-          </span>
+      <Container className="flex items-center justify-between h-20 md:h-24">
+        <a href="#top" className="flex items-center group" aria-label={business.name}>
+          <img
+            src={brand.assets.logo}
+            alt={business.name}
+            className="h-[58px] lg:h-[78px] w-auto max-w-[200px] lg:max-w-[260px] object-contain"
+          />
         </a>
 
         <nav className="hidden lg:flex items-center gap-8">
@@ -81,7 +80,7 @@ export default function Header() {
       </Container>
 
       {open && (
-        <div className="lg:hidden fixed inset-0 top-16 bg-white z-40 animate-in fade-in">
+        <div className="lg:hidden fixed inset-0 top-20 bg-white z-40 animate-in fade-in">
           <Container className="py-8 flex flex-col gap-2">
             {nav.map((item) => (
               <a

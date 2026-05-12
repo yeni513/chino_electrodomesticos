@@ -1,71 +1,85 @@
-# Chino Electrodomésticos — Design System
+# Trusted Appliances — Design System
 
-> Mood: confiable · cercano · honesto · calidad sin pretensiones.
-> No es Apple Store, es la tienda de barrio en la que tu vecino confió hace 20 años, ahora con presentación premium.
+> Mood: profesional · confiable · establecido · moderno sin estridencias.
+> Look de marca de electrodomésticos seria: navy clásico, dorado discreto, off-white limpio. Nada de neón, nada de fluorescente, nada de gradientes arcoíris.
 
 ## Color
 
 | Token Tailwind | HEX | Uso |
 |---|---|---|
-| `brand-ink` | `#0F172A` | Texto principal, fondos oscuros, header sólido al scroll |
-| `brand-accent` | `#F59E0B` | CTAs primarios, hover, subrayados, badges |
-| `brand-accent-dark` | `#B45309` | Hover del CTA primario, texto sobre cream |
-| `brand-cream` | `#FAF7F2` | Fondo cálido para secciones intermedias |
-| `slate-50 → 900` | — | Escala neutral completa de Tailwind |
+| `brand-ink` | `#0B2545` | Navy principal: texto, fondos oscuros, header al scroll |
+| `brand-ink-soft` | `#13315C` | Navy más claro para variaciones y gradientes |
+| `brand-accent` | `#C9A227` | Dorado discreto: CTAs primarios, detalles, badges |
+| `brand-accent-dark` | `#8E7320` | Hover del CTA primario |
+| `brand-cream` | `#F8FAFC` | Off-white para fondos de sección |
+| `brand-line` | `#E2E8F0` | Gris suave para bordes y separadores |
+| WhatsApp | `emerald-500/600` | Solo para CTAs que abren WhatsApp |
+| `slate-50 → 900` | — | Escala neutral complementaria |
 
 Reglas:
-- Máximo 1 acento (amber) por viewport visible.
-- Texto sobre fondos claros: `slate-900` para body, `slate-600` para soporte.
+- Máximo 1 acento (dorado) por viewport visible.
+- Texto sobre fondos claros: `brand-ink` para body, `slate-600` para soporte.
 - Texto sobre `brand-ink`: `white` o `slate-200`.
+- El verde de WhatsApp **siempre** es emerald, nunca el dorado de marca — evita confundir "marca" con "acción".
 
 ## Tipografía
 
-- **Display** — `Fraunces` (serif variable, opsz 9–144). Pesos 500/600/700.
-- **Body** — `Inter` (sans). Pesos 400/500/600.
+- **Display** — `Fraunces` (serif variable). Pesos 500/600/700. Para titulares y el nombre de marca.
+- **Body** — `Inter` (sans). Pesos 400/500/600. Para todo lo demás.
 - Solo 2 familias, máximo 3 pesos por página.
 
-Escala (clamp para titulares grandes, fija para body):
+Escala (clamp en titulares para fluidez):
 
 | Uso | Tamaño |
 |---|---|
-| Hero H1 | `clamp(2.5rem, 5vw + 1rem, 4.5rem)` — Fraunces 600 |
-| Section H2 | `clamp(1.875rem, 3vw + 1rem, 3rem)` — Fraunces 600 |
-| H3 / Card title | `1.25rem` — Inter 600 |
+| Hero H1 | `clamp(2.5rem, 5.5vw + 1rem, 5.75rem)` — Fraunces 600 |
+| Section H2 | `clamp(1.875rem, 3.2vw + 1rem, 3.75rem)` — Fraunces 600 |
+| CTA H2 | `clamp(2rem, 4vw + 1rem, 4.25rem)` — Fraunces 600 |
+| H3 / Card title | `1.25–1.5rem` — Inter/Fraunces 600 |
 | Body | `1rem` (16px) — Inter 400, line-height 1.6 |
 | Small / Caption | `0.875rem` — Inter 500 |
 
 ## Espaciado
 
-Base 4px (Tailwind default). Patrón de sección: `py-20 md:py-28` con `Container` (max-w 1280px, px responsive).
+Base 4px. Patrón de sección: `section-y` = `py-16 md:py-20 lg:py-24`. Container `max-w-container` (1440px), padding `px-6 md:px-8 lg:px-12 xl:px-16`.
 
 ## Radius
 
 - Cards: `rounded-card` (12px)
 - Botones: `rounded-lg` (8px)
 - Inputs: `rounded-lg`
-- Imágenes/avatares: `rounded-full` solo en avatares
+- Logo mark: `rounded-lg` (mantener consistencia con cards)
 
 ## Sombras
 
-- `shadow-soft` — cards estáticas, badge bars
+- `shadow-soft` — cards estáticas
 - `shadow-lift` — cards hover, modales, header al scroll
-- Nada de drop-shadow negro duro. Siempre con base slate translúcida.
+- Sombras siempre con base navy translúcida, no negro puro.
 
 ## Motion
 
 - Duración: 200–300ms
-- Easing: `cubic-bezier(0.22, 1, 0.36, 1)` (alias `ease-smooth` en Tailwind config)
-- Sin springs ni rebotes. Es retail, no juguete.
+- Easing: `cubic-bezier(0.22, 1, 0.36, 1)` (alias `ease-smooth`)
+- Sin springs ni rebotes. Es marca de confianza, no juguete.
 
-## Layout
+## Logo
 
-- Container `max-w-container` (1280px), padding `px-6 md:px-8 lg:px-12`.
-- Grid de productos/categorías: `1 → 2 (md) → 3 (lg)` o `1 → 2 → 4` para destacados.
-- Hero: editorial split — texto a la izquierda (col-span-7), visual a la derecha (col-span-5), apila en mobile.
+Archivos en `public/`:
+
+| Archivo | Cuándo se usa |
+|---|---|
+| `logo-trusted-appliances.png` | **Logo oficial**. Único activo de marca. Se usa en header, footer (sobre caja blanca), login y panel admin. |
+| `favicon.svg` | Versión simplificada para la pestaña del navegador (un favicon de 32×32 no puede mostrar el logo completo legible). |
+
+El logo oficial es navy sobre transparente. Sobre fondos oscuros (footer, secciones dark) se monta dentro de una caja blanca de padding cómodo. **Nunca** se redibuja, recolora ni recrea — solo se usa el archivo PNG oficial.
+
+Para reemplazar el logo, basta sustituir `public/logo-trusted-appliances.png` por el nuevo archivo (mismo nombre).
 
 ## Anti-patterns
 
-- Gradientes arcoíris, neón.
+- Gradientes arcoíris, neón, colores demasiado vibrantes.
 - Más de 2 CTAs primarios visibles a la vez.
-- Stock fotos genéricas (mujer riendo con auriculares). Si no hay foto real, usar gradient mesh o composición de iconos.
+- Stock fotos genéricas. Si no hay foto real, usar gradient mesh + icono.
 - Carruseles para contenido primario.
+- Verde para algo que no abre WhatsApp.
+- Mezclar el dorado de marca con CTAs de acción (que van en navy o emerald).
