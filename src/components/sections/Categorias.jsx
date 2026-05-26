@@ -3,15 +3,15 @@ import {
   WashingMachine,
   Shirt,
   Flame,
-  Wind,
-  Coffee,
+  Snowflake,
+  Layers,
   ArrowRight,
 } from 'lucide-react'
 import Container from '../layout/Container.jsx'
 import { categorias, categoriasFootnote } from '../../data/content.js'
 import { whatsappUrl } from '../../lib/whatsapp.js'
 
-const ICONS = { Refrigerator, WashingMachine, Shirt, Flame, Wind, Coffee }
+const ICONS = { Refrigerator, WashingMachine, Shirt, Flame, Snowflake, Layers }
 
 export default function Categorias() {
   return (

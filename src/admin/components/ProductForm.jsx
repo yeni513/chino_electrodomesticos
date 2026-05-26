@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { cloneElement, isValidElement, useEffect, useId, useRef, useState } from 'react'
 import { X, Loader2, Save } from 'lucide-react'
 import { supabase, PRODUCTS_TABLE } from '../../supabase/client.js'
 import ProductImageUpload from './ProductImageUpload.jsx'
+import { useToast } from '../lib/toast.jsx'
 
 const CATEGORIES = [
   { value: 'lavadora', label: 'Lavadora' },
@@ -34,36 +35,89 @@ const EMPTY = {
   sort_order: '',
 }
 
+function buildInitialValues(product) {
+  if (!product) return EMPTY
+  return {
+    title: product.title || '',
+    category: product.category || 'lavadora',
+    price: product.price ?? '',
+    status: product.status || 'disponible',
+    brand: product.brand || '',
+    color: product.color || '',
+    condition: product.condition || '',
+    short_description: product.short_description || '',
+    image_url: product.image_url || '',
+    featured: !!product.featured,
+    delivery_available: product.delivery_available !== false,
+    sort_order: product.sort_order ?? '',
+  }
+}
+
 export default function ProductForm({ product, onClose, onSaved }) {
-  const [values, setValues] = useState(EMPTY)
+  const [values, setValues] = useState(() => buildInitialValues(product))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
+  const [dirty, setDirty] = useState(false)
+  const initialRef = useRef(values)
+  const titleRef = useRef(null)
+  const toast = useToast()
+  const titleId = useId()
 
   const isEditing = !!product?.id
 
+  // Reset al cambiar producto (abrir Editar tras Editar otro).
   useEffect(() => {
-    if (product) {
-      setValues({
-        title: product.title || '',
-        category: product.category || 'lavadora',
-        price: product.price ?? '',
-        status: product.status || 'disponible',
-        brand: product.brand || '',
-        color: product.color || '',
-        condition: product.condition || '',
-        short_description: product.short_description || '',
-        image_url: product.image_url || '',
-        featured: !!product.featured,
-        delivery_available: product.delivery_available !== false,
-        sort_order: product.sort_order ?? '',
-      })
-    } else {
-      setValues(EMPTY)
-    }
+    const initial = buildInitialValues(product)
+    setValues(initial)
+    initialRef.current = initial
+    setDirty(false)
+    setError(null)
   }, [product])
 
+  // Autofocus en título al abrir.
+  useEffect(() => {
+    titleRef.current?.focus()
+  }, [])
+
+  // Escape cierra (avisa si hay cambios).
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === 'Escape') attemptClose()
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        document.getElementById('product-form-submit')?.click()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dirty])
+
+  // Warning del navegador si cerrás la pestaña con cambios.
+  useEffect(() => {
+    function onBeforeUnload(e) {
+      if (!dirty) return
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [dirty])
+
   function update(field, value) {
-    setValues((v) => ({ ...v, [field]: value }))
+    setValues((v) => {
+      const next = { ...v, [field]: value }
+      setDirty(true)
+      return next
+    })
+  }
+
+  function attemptClose() {
+    if (saving) return
+    if (dirty) {
+      const ok = window.confirm('Tienes cambios sin guardar. ¿Cerrar de todos modos?')
+      if (!ok) return
+    }
+    onClose?.()
   }
 
   async function handleSubmit(e) {
@@ -112,24 +166,39 @@ export default function ProductForm({ product, onClose, onSaved }) {
 
     if (response.error) {
       setError(response.error.message || 'No se pudo guardar el producto.')
+      toast.error('No se pudo guardar', {
+        description: 'Revisa los datos e inténtalo de nuevo.',
+      })
       return
     }
 
+    setDirty(false)
+    toast.success(isEditing ? 'Cambios guardados' : 'Producto creado', {
+      description: payload.title,
+    })
     onSaved?.(response.data)
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-stretch md:items-center justify-center bg-brand-ink/50 backdrop-blur-sm overflow-y-auto">
+    <div
+      className="fixed inset-0 z-50 flex items-stretch md:items-center justify-center bg-brand-ink/50 backdrop-blur-sm overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) attemptClose()
+      }}
+    >
       <div className="w-full md:max-w-3xl bg-white md:rounded-card md:my-8 shadow-lift flex flex-col">
         <header className="sticky top-0 bg-white border-b border-slate-200 px-5 md:px-7 py-4 flex items-center justify-between">
-          <h2 className="font-display font-semibold text-lg text-brand-ink">
+          <h2 id={titleId} className="font-display font-semibold text-lg text-brand-ink">
             {isEditing ? 'Editar producto' : 'Nuevo producto'}
           </h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={attemptClose}
             className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
-            aria-label="Cerrar"
+            aria-label="Cerrar formulario"
           >
             <X className="w-5 h-5" />
           </button>
@@ -138,11 +207,12 @@ export default function ProductForm({ product, onClose, onSaved }) {
         <form onSubmit={handleSubmit} className="px-5 md:px-7 py-6 space-y-6">
           <Field label="Nombre del producto" required>
             <input
+              ref={titleRef}
               type="text"
               required
               value={values.title}
               onChange={(e) => update('title', e.target.value)}
-              className="input"
+              className="input-admin"
               placeholder="Lavadora LG carga frontal 9 kg"
             />
           </Field>
@@ -152,7 +222,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
               <select
                 value={values.category}
                 onChange={(e) => update('category', e.target.value)}
-                className="input"
+                className="input-admin"
               >
                 {CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -164,7 +234,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
               <select
                 value={values.status}
                 onChange={(e) => update('status', e.target.value)}
-                className="input"
+                className="input-admin"
               >
                 {STATUSES.map((s) => (
                   <option key={s.value} value={s.value}>{s.label}</option>
@@ -177,9 +247,10 @@ export default function ProductForm({ product, onClose, onSaved }) {
                 type="number"
                 step="0.01"
                 min="0"
+                inputMode="decimal"
                 value={values.price}
                 onChange={(e) => update('price', e.target.value)}
-                className="input"
+                className="input-admin"
                 placeholder="599"
               />
             </Field>
@@ -187,9 +258,10 @@ export default function ProductForm({ product, onClose, onSaved }) {
             <Field label="Orden manual" hint="Menor número = aparece antes.">
               <input
                 type="number"
+                inputMode="numeric"
                 value={values.sort_order}
                 onChange={(e) => update('sort_order', e.target.value)}
-                className="input"
+                className="input-admin"
                 placeholder="100"
               />
             </Field>
@@ -199,7 +271,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
                 type="text"
                 value={values.brand}
                 onChange={(e) => update('brand', e.target.value)}
-                className="input"
+                className="input-admin"
                 placeholder="LG"
               />
             </Field>
@@ -209,7 +281,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
                 type="text"
                 value={values.color}
                 onChange={(e) => update('color', e.target.value)}
-                className="input"
+                className="input-admin"
                 placeholder="Blanco"
               />
             </Field>
@@ -219,7 +291,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
                 type="text"
                 value={values.condition}
                 onChange={(e) => update('condition', e.target.value)}
-                className="input"
+                className="input-admin"
                 placeholder="Nuevo en caja"
               />
             </Field>
@@ -231,27 +303,30 @@ export default function ProductForm({ product, onClose, onSaved }) {
               maxLength={280}
               value={values.short_description}
               onChange={(e) => update('short_description', e.target.value)}
-              className="input resize-none"
+              className="input-admin resize-none"
               placeholder="9 kg · 1.400 rpm · 14 programas · motor inverter"
             />
           </Field>
 
           <ProductImageUpload
             value={values.image_url}
-            onChange={(url) => update('image_url', url)}
+            onChange={(url) => {
+              setValues((v) => ({ ...v, image_url: url }))
+              setDirty(true)
+            }}
             productName={values.title}
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Toggle
               label="Destacado"
-              hint="Aparece primero en la sección de productos."
+              hint="Aparece primero en la web pública, sobre los demás."
               checked={values.featured}
               onChange={(v) => update('featured', v)}
             />
             <Toggle
               label="Entrega disponible"
-              hint="Muestra la pill “Entrega disponible” en la card."
+              hint="Muestra la pill “Entrega disponible” en la card pública."
               checked={values.delivery_available}
               onChange={(v) => update('delivery_available', v)}
             />
@@ -265,6 +340,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2 sticky bottom-0 bg-white">
             <button
+              id="product-form-submit"
               type="submit"
               disabled={saving}
               className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 py-3 rounded-lg bg-brand-ink text-white font-semibold text-sm hover:bg-slate-800 transition-colors disabled:opacity-60"
@@ -275,44 +351,42 @@ export default function ProductForm({ product, onClose, onSaved }) {
 
             <button
               type="button"
-              onClick={onClose}
+              onClick={attemptClose}
               className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 py-3 rounded-lg ring-1 ring-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors"
             >
               Cancelar
             </button>
+
+            <p className="hidden md:flex items-center text-xs text-slate-400 ml-auto">
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 ring-1 ring-slate-200 text-[10px] mr-1">⌘</kbd>
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 ring-1 ring-slate-200 text-[10px]">Enter</kbd>
+              <span className="ml-1.5">para guardar</span>
+            </p>
           </div>
         </form>
       </div>
-
-      <style>{`
-        .input {
-          width: 100%;
-          padding: 0.7rem 0.9rem;
-          border-radius: 0.5rem;
-          background: white;
-          box-shadow: inset 0 0 0 1px rgb(226 232 240);
-          font-size: 0.9rem;
-          color: rgb(15 23 42);
-          transition: box-shadow 150ms;
-        }
-        .input:focus {
-          outline: none;
-          box-shadow: inset 0 0 0 2px rgb(245 158 11);
-        }
-      `}</style>
     </div>
   )
 }
 
 function Field({ label, hint, required, children }) {
+  const hintId = useId()
+  const child = hint && isValidElement(children)
+    ? cloneElement(children, { 'aria-describedby': hintId })
+    : children
+
   return (
     <label className="block">
       <span className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
         {label}
         {required && <span className="text-rose-600 ml-1">*</span>}
       </span>
-      {children}
-      {hint && <span className="block mt-1.5 text-xs text-slate-400">{hint}</span>}
+      {child}
+      {hint && (
+        <span id={hintId} className="block mt-1.5 text-xs text-slate-500">
+          {hint}
+        </span>
+      )}
     </label>
   )
 }
@@ -323,6 +397,7 @@ function Toggle({ label, hint, checked, onChange }) {
       <span className="relative mt-0.5 shrink-0">
         <input
           type="checkbox"
+          role="switch"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
           className="peer sr-only"

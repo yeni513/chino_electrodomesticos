@@ -15,7 +15,7 @@ export default function PorQueNosotros() {
         className="absolute inset-0 opacity-50"
         style={{
           backgroundImage:
-            'radial-gradient(circle at 85% 15%, rgba(245,158,11,0.28), transparent 45%), radial-gradient(circle at 10% 90%, rgba(245,158,11,0.14), transparent 45%)',
+            'radial-gradient(circle at 85% 15%, rgba(201,162,39,0.28), transparent 45%), radial-gradient(circle at 10% 90%, rgba(201,162,39,0.14), transparent 45%)',
         }}
       />
       <Container className="relative">

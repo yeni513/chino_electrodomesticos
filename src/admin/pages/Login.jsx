@@ -9,23 +9,23 @@ import {
 import { useAuth } from '../../supabase/AuthContext.jsx'
 import { brand, business } from '../../data/content.js'
 
+const IS_DEV = import.meta.env.DEV
+
 function humanizeError(message) {
   if (!message) return 'No se pudo iniciar sesión.'
   const m = message.toLowerCase()
   if (m.includes('failed to fetch') || m.includes('networkerror')) {
-    return (
-      'No se pudo contactar con Supabase. Revisa que VITE_SUPABASE_URL y ' +
-      'VITE_SUPABASE_ANON_KEY estén configuradas (local: .env.local + reiniciar ' +
-      'dev server · Vercel: Settings → Environment Variables + redeploy).'
-    )
+    return IS_DEV
+      ? 'No se pudo contactar con Supabase. Revisa VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY en .env.local y reinicia el dev server.'
+      : 'No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.'
   }
   if (m.includes('invalid login credentials')) {
     return 'Correo o contraseña incorrectos.'
   }
   if (m.includes('email not confirmed')) {
-    return 'Tu usuario aún no está confirmado. Pídele a tu desarrollador que lo confirme en Supabase.'
+    return 'Tu usuario aún no está confirmado. Pídele a tu desarrollador que lo active en Supabase.'
   }
-  return message
+  return IS_DEV ? message : 'No se pudo iniciar sesión. Inténtalo de nuevo.'
 }
 
 export default function Login() {
@@ -101,19 +101,27 @@ export default function Login() {
               <div className="flex items-start gap-2.5">
                 <AlertTriangle className="w-4 h-4 mt-0.5 text-amber-700 shrink-0" />
                 <div className="text-sm text-amber-900">
-                  <p className="font-semibold">Configuración incompleta</p>
-                  <p className="mt-1 text-xs leading-relaxed">{supabaseConfigError}</p>
-                  <ul className="mt-2 text-xs list-disc pl-4 space-y-1 leading-relaxed">
-                    <li>
-                      <strong>Local:</strong> añade las variables a{' '}
-                      <code className="px-1 py-0.5 rounded bg-amber-100">.env.local</code>{' '}
-                      y reinicia <code className="px-1 py-0.5 rounded bg-amber-100">npm run dev</code>.
-                    </li>
-                    <li>
-                      <strong>Vercel:</strong> añádelas en Settings → Environment
-                      Variables (Production + Preview + Development) y haz un Redeploy.
-                    </li>
-                  </ul>
+                  <p className="font-semibold">Servicio no disponible</p>
+                  {IS_DEV ? (
+                    <>
+                      <p className="mt-1 text-xs leading-relaxed">{supabaseConfigError}</p>
+                      <ul className="mt-2 text-xs list-disc pl-4 space-y-1 leading-relaxed">
+                        <li>
+                          <strong>Local:</strong> añade las variables a{' '}
+                          <code className="px-1 py-0.5 rounded bg-amber-100">.env.local</code>{' '}
+                          y reinicia <code className="px-1 py-0.5 rounded bg-amber-100">npm run dev</code>.
+                        </li>
+                        <li>
+                          <strong>Vercel:</strong> añádelas en Settings → Environment
+                          Variables (Production + Preview + Development) y haz un Redeploy.
+                        </li>
+                      </ul>
+                    </>
+                  ) : (
+                    <p className="mt-1 text-xs leading-relaxed">
+                      El panel está temporalmente fuera de servicio. Contacta a tu desarrollador.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -134,7 +142,8 @@ export default function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-3 py-3 rounded-lg ring-1 ring-slate-200 focus:ring-2 focus:ring-brand-accent focus:outline-none bg-white text-sm text-brand-ink"
+                  className="w-full pl-10 pr-3 py-3 rounded-lg ring-1 ring-slate-200 focus:ring-2 focus:ring-brand-accent focus:outline-none bg-white text-brand-ink"
+                  style={{ fontSize: '16px' }}
                   placeholder="tu@correo.com"
                 />
               </div>
@@ -153,7 +162,8 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-3 py-3 rounded-lg ring-1 ring-slate-200 focus:ring-2 focus:ring-brand-accent focus:outline-none bg-white text-sm text-brand-ink"
+                  className="w-full pl-10 pr-3 py-3 rounded-lg ring-1 ring-slate-200 focus:ring-2 focus:ring-brand-accent focus:outline-none bg-white text-brand-ink"
+                  style={{ fontSize: '16px' }}
                   placeholder="••••••••"
                 />
               </div>
@@ -175,9 +185,17 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="mt-6 text-xs text-slate-400 leading-relaxed">
-            ¿No tienes acceso? Pídele al desarrollador que te cree un usuario en Supabase.
-          </p>
+          <div className="mt-6 flex flex-col gap-2 text-xs text-slate-500 leading-relaxed">
+            <Link
+              to="/admin/reset"
+              className="text-brand-accent-dark font-semibold hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+            <span className="text-slate-400">
+              ¿No tienes acceso? Pídele al desarrollador que te cree un usuario.
+            </span>
+          </div>
         </div>
       </div>
     </div>

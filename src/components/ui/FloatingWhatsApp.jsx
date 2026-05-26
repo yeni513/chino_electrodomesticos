@@ -8,7 +8,10 @@ export default function FloatingWhatsApp() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Escribir por WhatsApp"
-      className="group fixed bottom-5 right-5 md:bottom-6 md:right-6 z-40"
+      className="group fixed right-5 md:right-6 z-40"
+      style={{
+        bottom: 'calc(1.25rem + env(safe-area-inset-bottom))',
+      }}
     >
       {/* Pulse halo */}
       <span

@@ -3,6 +3,8 @@ import Container from '../layout/Container.jsx'
 import { testimonios } from '../../data/content.js'
 
 export default function Testimonios() {
+  if (!testimonios || testimonios.length === 0) return null
+
   return (
     <section className="section-y bg-white">
       <Container>

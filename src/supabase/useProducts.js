@@ -9,7 +9,7 @@ import { mapSupabaseProduct, sortPublicProducts } from './mapProduct.js'
  *  3. sort_order ascendente
  *  4. created_at descendente (desempate)
  *
- * Devuelve productos ya mapeados al shape que espera la UI.
+ * Excluye los soft-deleted (deleted_at is null).
  */
 export function useProducts({ onlyAvailable = false } = {}) {
   const [products, setProducts] = useState(null)
@@ -22,7 +22,9 @@ export function useProducts({ onlyAvailable = false } = {}) {
       let query = supabase
         .from(PRODUCTS_TABLE)
         .select('*')
+        .is('deleted_at', null)
         .order('created_at', { ascending: false })
+        .limit(200)
 
       if (onlyAvailable) {
         query = query.eq('status', 'disponible')
@@ -59,8 +61,7 @@ export function useProducts({ onlyAvailable = false } = {}) {
 }
 
 /**
- * Lee productos para el panel admin (sin transformar). Orden por
- * created_at descendente para que lo nuevo aparezca arriba.
+ * Productos activos del admin (excluye papelera).
  */
 export function useAdminProducts(reloadKey) {
   const [rows, setRows] = useState(null)
@@ -68,11 +69,14 @@ export function useAdminProducts(reloadKey) {
 
   useEffect(() => {
     let cancelled = false
+    setError(null)
 
     supabase
       .from(PRODUCTS_TABLE)
       .select('*')
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
+      .limit(500)
       .then(({ data, error: err }) => {
         if (cancelled) return
         if (err) {
@@ -88,5 +92,40 @@ export function useAdminProducts(reloadKey) {
     }
   }, [reloadKey])
 
-  return { rows, loading: rows === null, error }
+  return { rows, setRows, loading: rows === null, error }
+}
+
+/**
+ * Productos en papelera (soft-deleted). Ordenados por deleted_at descendente.
+ */
+export function useTrashProducts(reloadKey) {
+  const [rows, setRows] = useState(null)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    setError(null)
+
+    supabase
+      .from(PRODUCTS_TABLE)
+      .select('*')
+      .not('deleted_at', 'is', null)
+      .order('deleted_at', { ascending: false })
+      .limit(200)
+      .then(({ data, error: err }) => {
+        if (cancelled) return
+        if (err) {
+          setError(err)
+          setRows([])
+          return
+        }
+        setRows(data || [])
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [reloadKey])
+
+  return { rows, setRows, loading: rows === null, error }
 }

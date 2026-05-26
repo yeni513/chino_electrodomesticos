@@ -1,15 +1,14 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import PublicSite from './PublicSite.jsx'
-import ProtectedRoute from './admin/components/ProtectedRoute.jsx'
 
-const Login = lazy(() => import('./admin/pages/Login.jsx'))
-const Dashboard = lazy(() => import('./admin/pages/Dashboard.jsx'))
+const AdminShell = lazy(() => import('./admin/AdminShell.jsx'))
+const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 
-function AdminLoader() {
+function FullScreenLoader() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <p className="text-sm text-slate-500">Cargando panel…</p>
+      <p className="text-sm text-slate-500">Cargando…</p>
     </div>
   )
 }
@@ -19,25 +18,21 @@ export default function App() {
     <Routes>
       <Route path="/" element={<PublicSite />} />
       <Route
-        path="/admin/login"
+        path="/admin/*"
         element={
-          <Suspense fallback={<AdminLoader />}>
-            <Login />
+          <Suspense fallback={<FullScreenLoader />}>
+            <AdminShell />
           </Suspense>
         }
       />
       <Route
-        path="/admin/dashboard"
+        path="*"
         element={
-          <ProtectedRoute>
-            <Suspense fallback={<AdminLoader />}>
-              <Dashboard />
-            </Suspense>
-          </ProtectedRoute>
+          <Suspense fallback={<FullScreenLoader />}>
+            <NotFound />
+          </Suspense>
         }
       />
-      <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

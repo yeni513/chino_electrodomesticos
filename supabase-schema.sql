@@ -15,6 +15,9 @@ create table if not exists public.products (
   id                  uuid primary key default gen_random_uuid(),
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now(),
+  -- Soft delete: null = visible, timestamp = en papelera. Las queries públicas
+  -- y el listado normal del admin filtran por `deleted_at is null`.
+  deleted_at          timestamptz,
 
   title               text   not null,
   category            text   not null
@@ -37,10 +40,15 @@ create table if not exists public.products (
   sort_order          integer default 100
 );
 
+-- Migración idempotente: añade `deleted_at` si la columna no existe.
+alter table public.products
+  add column if not exists deleted_at timestamptz;
+
 create index if not exists products_status_idx       on public.products (status);
 create index if not exists products_featured_idx     on public.products (featured);
 create index if not exists products_sort_order_idx   on public.products (sort_order);
 create index if not exists products_created_at_idx   on public.products (created_at desc);
+create index if not exists products_deleted_at_idx   on public.products (deleted_at);
 
 
 -- Trigger que mantiene updated_at al día en cada UPDATE

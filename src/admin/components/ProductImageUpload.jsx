@@ -1,49 +1,72 @@
 import { useRef, useState } from 'react'
 import { Image as ImageIcon, Upload, Loader2, Trash2 } from 'lucide-react'
 import { supabase, PRODUCT_IMAGES_BUCKET } from '../../supabase/client.js'
-
-function slug(str) {
-  return (str || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)+/g, '')
-    .slice(0, 40) || 'producto'
-}
+import {
+  compressImage,
+  deleteStorageObjectByPublicUrl,
+  slugify,
+  validateImageFile,
+  ACCEPTED_TYPES,
+} from '../lib/imageUtils.js'
+import { useToast } from '../lib/toast.jsx'
 
 export default function ProductImageUpload({ value, onChange, productName }) {
   const inputRef = useRef(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState(null)
+  const toast = useToast()
 
-  async function handleFile(file) {
-    if (!file) return
+  async function handleFile(rawFile) {
+    if (!rawFile) return
     setError(null)
+
+    const validationError = validateImageFile(rawFile)
+    if (validationError) {
+      setError(validationError)
+      toast.error('Imagen no válida', { description: validationError })
+      if (inputRef.current) inputRef.current.value = ''
+      return
+    }
+
     setUploading(true)
 
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
-    const id = (crypto.randomUUID && crypto.randomUUID()) || `${Date.now()}-${Math.random().toString(36).slice(2)}`
-    const path = `products/${slug(productName)}-${id}.${ext}`
+    const previousUrl = value
+    const file = await compressImage(rawFile)
+    const ext = (file.name.split('.').pop() || 'webp').toLowerCase()
+    const id = crypto.randomUUID()
+    const path = `products/${slugify(productName)}-${id}.${ext}`
 
     const { error: uploadError } = await supabase.storage
       .from(PRODUCT_IMAGES_BUCKET)
-      .upload(path, file, { cacheControl: '3600', upsert: false })
+      .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type })
 
     if (uploadError) {
       setUploading(false)
-      setError(uploadError.message || 'No se pudo subir la imagen.')
+      const msg = uploadError.message || 'No se pudo subir la imagen.'
+      setError(msg)
+      toast.error('Error al subir la imagen', { description: msg })
       return
     }
 
     const { data } = supabase.storage.from(PRODUCT_IMAGES_BUCKET).getPublicUrl(path)
+
+    // Best-effort cleanup de la imagen previa para evitar storage bloat.
+    if (previousUrl) {
+      deleteStorageObjectByPublicUrl(previousUrl).catch(() => {})
+    }
+
     setUploading(false)
     onChange(data.publicUrl)
+    if (inputRef.current) inputRef.current.value = ''
   }
 
   function handleRemove() {
+    const previousUrl = value
     onChange('')
     if (inputRef.current) inputRef.current.value = ''
+    if (previousUrl) {
+      deleteStorageObjectByPublicUrl(previousUrl).catch(() => {})
+    }
   }
 
   return (
@@ -67,7 +90,7 @@ export default function ProductImageUpload({ value, onChange, productName }) {
           <input
             ref={inputRef}
             type="file"
-            accept="image/*"
+            accept={ACCEPTED_TYPES.join(',')}
             onChange={(e) => handleFile(e.target.files?.[0])}
             className="hidden"
           />
@@ -77,7 +100,7 @@ export default function ProductImageUpload({ value, onChange, productName }) {
               type="button"
               onClick={() => inputRef.current?.click()}
               disabled={uploading}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand-ink text-white text-xs font-semibold hover:bg-slate-800 transition-colors disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand-ink text-white text-xs font-semibold hover:bg-slate-800 transition-colors disabled:opacity-60 min-h-[44px]"
             >
               {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
               {uploading ? 'Subiendo…' : value ? 'Reemplazar' : 'Subir foto'}
@@ -87,7 +110,7 @@ export default function ProductImageUpload({ value, onChange, productName }) {
               <button
                 type="button"
                 onClick={handleRemove}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-rose-700 text-xs font-semibold hover:bg-rose-50 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-rose-700 text-xs font-semibold hover:bg-rose-50 transition-colors min-h-[44px]"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Quitar
@@ -96,7 +119,7 @@ export default function ProductImageUpload({ value, onChange, productName }) {
           </div>
 
           <p className="mt-3 text-xs text-slate-500 leading-relaxed">
-            Recomendado 1200×900 px o más, JPG/WebP. Se sube al storage público de Supabase.
+            JPG, PNG o WebP · máximo 5 MB. Se comprime y reescala automáticamente a 1600 px.
           </p>
 
           {error && (

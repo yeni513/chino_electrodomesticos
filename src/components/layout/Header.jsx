@@ -37,7 +37,11 @@ export default function Header() {
           <img
             src={brand.assets.logo}
             alt={business.name}
-            className="h-[58px] lg:h-[78px] w-auto max-w-[200px] lg:max-w-[260px] object-contain"
+            width="260"
+            height="78"
+            fetchpriority="high"
+            decoding="async"
+            className="h-[52px] lg:h-[78px] w-auto max-w-[180px] lg:max-w-[260px] object-contain"
           />
         </a>
 

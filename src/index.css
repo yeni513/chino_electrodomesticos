@@ -10,9 +10,19 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Evita scroll horizontal por cards flotantes en breakpoints intermedios. */
+  html, body {
+    overflow-x: clip;
+  }
+
   body {
     @apply bg-white text-brand-ink font-sans;
     font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* Cualquier sección con id queda visible debajo del header sticky (h-20/h-24). */
+  [id] {
+    scroll-margin-top: 6rem;
   }
 
   ::selection {
@@ -57,5 +67,33 @@
       radial-gradient(at 80% 0%, rgba(31, 61, 99, 0.10) 0px, transparent 50%),
       radial-gradient(at 70% 80%, rgba(43, 81, 132, 0.12) 0px, transparent 50%),
       linear-gradient(180deg, #F8FAFC 0%, #ffffff 100%);
+  }
+
+  /* Inputs admin a 16px para evitar zoom de Safari iOS al hacer focus. */
+  .input-admin {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border-radius: 0.5rem;
+    background: white;
+    box-shadow: inset 0 0 0 1px rgb(226 232 240);
+    font-size: 16px;
+    color: rgb(15 23 42);
+    transition: box-shadow 150ms;
+  }
+  .input-admin:focus {
+    outline: none;
+    box-shadow: inset 0 0 0 2px rgb(245 158 11);
+  }
+}
+
+/* Respeta preferencia del sistema de movimiento reducido. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

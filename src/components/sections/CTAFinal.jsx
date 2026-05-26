@@ -15,7 +15,7 @@ export default function CTAFinal() {
             className="absolute inset-0 opacity-70"
             style={{
               backgroundImage:
-                'radial-gradient(circle at 15% 25%, rgba(245,158,11,0.4), transparent 50%), radial-gradient(circle at 85% 80%, rgba(16,185,129,0.22), transparent 50%)',
+                'radial-gradient(circle at 15% 25%, rgba(201,162,39,0.4), transparent 50%), radial-gradient(circle at 85% 80%, rgba(16,185,129,0.22), transparent 50%)',
             }}
           />
           <div

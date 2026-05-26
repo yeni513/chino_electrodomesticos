@@ -24,9 +24,11 @@ export const brand = {
   tagline: 'Electrodomésticos confiables para tu hogar',
   assets: {
     // Logo oficial recortado (sin whitespace). Se usa en header, footer, login y admin.
-    logo: '/logo-trusted-appliances-cropped.png',
+    logo: '/logo-trusted-appliances-cropped.webp',
+    logoPng: '/logo-trusted-appliances-cropped.png',
     // Versión original con whitespace alrededor. Útil para OG image y social previews.
-    logoFull: '/logo-trusted-appliances.png',
+    logoFull: '/logo-trusted-appliances.webp',
+    logoFullPng: '/logo-trusted-appliances.png',
     // Favicon simplificado (32×32 para la pestaña del navegador).
     favicon: '/favicon.svg',
   },
@@ -39,14 +41,18 @@ export const brand = {
   },
 }
 
+// URL de producción. Cambiar al deployar al dominio final.
+export const siteUrl = 'https://trusted-appliances.vercel.app'
+
 export const seo = {
-  title: 'Trusted Appliances · Refrigeradores, lavadoras, secadoras y estufas',
+  title: 'Trusted Appliances · Refrigeradores, lavadoras y estufas en Cleveland, OH',
   description:
-    'Trusted Appliances ofrece refrigeradores, lavadoras, secadoras, estufas y más. Consulta inventario disponible y precios actuales por WhatsApp.',
-  ogTitle: 'Trusted Appliances · Electrodomésticos confiables para tu hogar',
+    'Refrigeradores, lavadoras, secadoras y estufas con entrega coordinada en Cleveland y el área de Ohio. Precios por WhatsApp, equipos revisados antes de salir.',
+  ogTitle: 'Trusted Appliances · Electrodomésticos confiables en Cleveland, OH',
   ogDescription:
-    'Refrigeradores, lavadoras, secadoras, estufas y más. Pregúntanos por inventario disponible, fotos y precios por WhatsApp.',
-  locale: 'es_US',
+    'Refrigeradores, lavadoras, secadoras, estufas y más. Entrega coordinada en Cleveland. Pregúntanos por fotos, precios y disponibilidad por WhatsApp.',
+  ogImage: `${siteUrl}/og-image.jpg`,
+  locale: 'es_419',
   siteName: 'Trusted Appliances',
 }
 
@@ -56,8 +62,12 @@ export const business = {
   phone: '+1 (216) 278-4775',
   whatsapp: '12162784775',
   email: '',
-  address: 'Pregúntanos la dirección por WhatsApp',
-  hours: 'Horario de tienda — consulta por WhatsApp',
+  city: 'Cleveland',
+  region: 'OH',
+  country: 'US',
+  serviceArea: 'Cleveland y área metropolitana, OH',
+  address: 'Atención por WhatsApp · visitas con cita previa',
+  hours: 'Lun–Sáb · Respuesta por WhatsApp en horario de tienda',
 }
 
 export const nav = [
@@ -68,14 +78,14 @@ export const nav = [
 ]
 
 export const hero = {
-  eyebrow: 'Trusted Appliances · Atención personalizada',
-  headline: 'Electrodomésticos confiables para tu hogar',
+  eyebrow: 'Cleveland, OH · Atención directa por WhatsApp',
+  headline: 'Refrigeradores, lavadoras y estufas — entregados en Cleveland',
   subhead:
-    'Refrigeradores, lavadoras, secadoras y estufas revisados antes de entregarte. Asesoría directa por WhatsApp y precios claros — sin call center.',
-  primaryCta: { label: 'Ver electrodomésticos', href: '#destacados' },
-  secondaryCta: { label: 'Ver opciones por WhatsApp', href: 'whatsapp-direct' },
+    'Equipos revisados y entregados a tu casa por la misma persona que te asesora. Precio final por WhatsApp, sin call center ni cargos sorpresa.',
+  primaryCta: { label: 'Ver lo disponible esta semana', href: '#destacados' },
+  secondaryCta: { label: 'Preguntar por WhatsApp', href: 'whatsapp-direct' },
   microcopy:
-    'Pídenos fotos, precios y disponibilidad por WhatsApp — te respondemos lo antes posible.',
+    'Te respondemos en horario de tienda con fotos, precio final y disponibilidad real — sin formularios ni esperas.',
   categoryChips: [
     { icon: 'Refrigerator', label: 'Refrigeradores' },
     { icon: 'WashingMachine', label: 'Lavadoras' },
@@ -83,9 +93,9 @@ export const hero = {
     { icon: 'Flame', label: 'Estufas' },
   ],
   trustBullets: [
-    'Atención directa por WhatsApp',
-    'Opciones según inventario',
-    'Asesoría sin compromiso',
+    'Entrega coordinada en Cleveland',
+    'Equipos revisados antes de salir',
+    'Precio final por WhatsApp',
   ],
   applianceCards: [
     {
@@ -119,47 +129,49 @@ export const hero = {
   ],
 }
 
+// Mantener IDs alineados con el `category` del admin Supabase
+// (lavadora, secadora, estufa, refrigerador, freezer, combo, otro).
 export const categorias = [
   {
-    id: 'refrigeradores',
+    id: 'refrigerador',
     icon: 'Refrigerator',
     label: 'Refrigeradores',
     description: 'No frost, side by side y bajo mesón.',
     cta: 'Preguntar disponibilidad',
   },
   {
-    id: 'lavadoras',
+    id: 'lavadora',
     icon: 'WashingMachine',
     label: 'Lavadoras',
     description: 'Carga frontal y superior, distintas capacidades.',
     cta: 'Preguntar disponibilidad',
   },
   {
-    id: 'secadoras',
+    id: 'secadora',
     icon: 'Shirt',
     label: 'Secadoras',
-    description: 'Bomba de calor, ventilación y combos lavasecas.',
+    description: 'Bomba de calor, ventilación y eléctricas.',
     cta: 'Preguntar disponibilidad',
   },
   {
-    id: 'estufas',
+    id: 'estufa',
     icon: 'Flame',
     label: 'Estufas y cocinas',
     description: 'A gas, eléctricas e inducción con horno.',
     cta: 'Preguntar disponibilidad',
   },
   {
-    id: 'climatizacion',
-    icon: 'Wind',
-    label: 'Aire acondicionado',
-    description: 'Split, portátil e inverter según tu metraje.',
+    id: 'freezer',
+    icon: 'Snowflake',
+    label: 'Freezers',
+    description: 'Verticales y horizontales, distintas capacidades.',
     cta: 'Preguntar disponibilidad',
   },
   {
-    id: 'pae',
-    icon: 'Coffee',
-    label: 'Pequeño electrodoméstico',
-    description: 'Microondas, licuadoras, cafeteras y más.',
+    id: 'combo',
+    icon: 'Layers',
+    label: 'Combos lavadora/secadora',
+    description: 'Stack o all-in-one para espacios pequeños.',
     cta: 'Preguntar disponibilidad',
   },
 ]
@@ -191,10 +203,10 @@ export const porQue = [
 ]
 
 export const destacadosIntro = {
-  eyebrow: 'Destacados',
-  headline: 'Algunos de los modelos que más nos consultan',
+  eyebrow: 'Disponibles ahora',
+  headline: 'Lo que tenemos esta semana',
   subhead:
-    'Una muestra del catálogo. Pídenos fotos, vídeo o el precio actualizado por WhatsApp antes de venir — el inventario cambia.',
+    'Muestra del inventario actual. Pídenos fotos extra, video o el precio final por WhatsApp — el stock cambia rápido.',
 }
 
 // Fallback mostrado solo si la tabla de productos en Supabase está vacía.
@@ -267,26 +279,9 @@ export const marcas = [
   'KitchenAid',
 ]
 
-export const testimonios = [
-  {
-    quote:
-      'Llegué buscando una lavadora y me explicaron las diferencias sin presión. Me llevé la que de verdad encajaba con mi familia, no la más cara.',
-    name: '',
-    role: 'Cliente del barrio',
-  },
-  {
-    quote:
-      'Pregunté por WhatsApp y me respondieron rápido. Cuando llegó el refrigerador, lo revisaron delante de mí. Esa cercanía no la encuentras en una cadena grande.',
-    name: '',
-    role: 'Compra reciente',
-  },
-  {
-    quote:
-      'Llevo tiempo comprándoles. Si algo necesita atención, sé dónde están y me ayudan. Eso vale más que cualquier descuento agresivo.',
-    name: '',
-    role: 'Cliente frecuente',
-  },
-]
+// Vacío hasta tener testimonios reales con nombre y ciudad. La sección
+// se oculta automáticamente cuando el array está vacío.
+export const testimonios = []
 
 export const faqs = [
   {
@@ -298,8 +293,8 @@ export const faqs = [
     a: 'Tenemos entrega coordinada según tu zona y horario. Te confirmamos por WhatsApp el día y la franja antes de salir. Consúltanos para tu caso.',
   },
   {
-    q: '¿Los electrodomésticos son nuevos?',
-    a: 'Sí, todos los equipos son nuevos y traen la garantía oficial de fábrica del fabricante. Antes de entregarlos pasamos una revisión visual y de encendido.',
+    q: '¿Los electrodomésticos son nuevos o usados?',
+    a: 'Trabajamos equipos nuevos en caja, seminuevos y usados revisados. Cada ficha de producto indica la condición. Antes de entregar, todos pasan una revisión visual y de encendido — si detectamos un defecto, no se entrega.',
   },
   {
     q: '¿Qué pasa si el equipo presenta una falla?',
