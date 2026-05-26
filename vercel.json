@@ -19,12 +19,6 @@
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
         { "key": "Cache-Control", "value": "no-store, max-age=0" }
       ]
-    },
-    {
-      "source": "/(favicon.svg|logo-trusted-appliances.*\\.(webp|png)|apple-touch-icon.png|og-image.jpg)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
     }
   ]
 }
