@@ -127,11 +127,10 @@ export default function Hero() {
 
 function HeroVisual() {
   return (
-    // Wrapper exterior con padding asimétrico: deja espacio fuera del card
-    // principal para que las cards flotantes (Equipos / Atención rápida)
-    // queden POR FUERA del aspect-ratio container y no tapen el grid de
-    // productos.
-    <div className="relative pt-3 pb-5 pl-2 pr-2 md:pt-4 md:pb-6 md:pl-3 md:pr-3 lg:pt-5 lg:pb-8 lg:pl-4 lg:pr-4 w-full max-w-md mx-auto lg:max-w-none">
+    // Wrapper exterior con padding grande arriba/abajo desde sm+ para que
+    // las cards flotantes (Equipos / Atención rápida) quepan FUERA del
+    // aspect-ratio container sin tapar el grid de productos.
+    <div className="relative pt-3 pb-5 pl-2 pr-2 sm:pt-14 sm:pb-14 md:pt-16 md:pb-16 lg:pt-16 lg:pb-16 lg:pl-4 lg:pr-4 w-full max-w-md mx-auto lg:max-w-none">
       {/* Card principal con aspect-ratio fijo */}
       <div className="relative aspect-square sm:aspect-[5/4] lg:aspect-[5/6]">
         {/* Marco / fondo */}
@@ -192,35 +191,34 @@ function HeroVisual() {
       </div>
 
       {/* Card flotante: WhatsApp / atención rápida
-          Posicionada respecto al WRAPPER exterior (no al aspect container)
-          y solo en sm+ para no tapar el grid en mobile pequeño. */}
+          Pill horizontal compacta posicionada respecto al WRAPPER.
+          Single-line para que su altura (~48px) quepa dentro del padding
+          inferior del wrapper sin tapar el aspect container. */}
       <a
         href={whatsappUrl('Hola, quiero información sobre electrodomésticos disponibles.')}
         target="_blank"
         rel="noopener noreferrer"
-        className="hidden sm:flex absolute bottom-0 left-0 md:bottom-1 md:left-1 lg:bottom-2 lg:left-2 bg-brand-ink text-white rounded-card shadow-lift p-3 md:p-4 lg:p-5 max-w-[210px] md:max-w-[230px] lg:max-w-[260px] ring-1 ring-white/5 hover:ring-emerald-400/40 transition-all duration-300 ease-smooth motion-safe:hover:-translate-y-1 group"
+        className="hidden sm:inline-flex absolute bottom-2 left-1 md:bottom-3 md:left-2 lg:bottom-3 lg:left-3 items-center gap-2.5 bg-brand-ink text-white rounded-full shadow-lift pl-1.5 pr-4 py-1.5 md:pl-2 md:pr-5 md:py-2 ring-1 ring-white/5 hover:ring-emerald-400/40 transition-all duration-300 ease-smooth motion-safe:hover:-translate-y-0.5 group"
       >
-        <div className="flex items-center gap-2.5 md:gap-3">
-          <span className="relative inline-flex h-9 w-9 md:h-10 md:w-10 lg:h-11 lg:w-11 items-center justify-center rounded-lg bg-emerald-600 text-white shrink-0 group-hover:bg-emerald-500 transition-colors">
-            <MessageCircle className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
-            <span aria-hidden className="absolute inset-0 rounded-lg ring-2 ring-emerald-400/50 motion-safe:animate-pulse" />
-          </span>
-          <div>
-            <p className="text-sm md:text-base font-semibold leading-tight">Atención rápida</p>
-            <p className="text-[11px] md:text-xs lg:text-sm text-slate-300 mt-0.5">Respondemos por WhatsApp</p>
-          </div>
-        </div>
+        <span className="relative inline-flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full bg-emerald-600 text-white shrink-0 group-hover:bg-emerald-500 transition-colors">
+          <MessageCircle className="w-4 h-4 md:w-5 md:h-5" />
+          <span aria-hidden className="absolute inset-0 rounded-full ring-2 ring-emerald-400/50 motion-safe:animate-pulse" />
+        </span>
+        <span className="text-xs md:text-sm font-semibold leading-tight whitespace-nowrap">
+          Respondemos por WhatsApp
+        </span>
       </a>
 
       {/* Card flotante: equipos nuevos
-          Posicionada respecto al WRAPPER, solo en sm+. */}
-      <div className="hidden sm:block absolute top-0 right-0 md:top-1 md:right-1 lg:top-2 lg:right-2 bg-white rounded-card shadow-lift p-2.5 md:p-3.5 lg:p-4 ring-1 ring-slate-200/70 max-w-[170px] md:max-w-[190px] lg:max-w-[210px]">
-        <p className="text-[10px] md:text-[11px] lg:text-xs font-semibold uppercase tracking-wider text-brand-accent-dark leading-tight">
-          Equipos nuevos y revisados
-        </p>
-        <p className="text-xs md:text-sm lg:text-base font-display font-semibold text-brand-ink leading-tight mt-1 hidden md:block">
-          Garantía de fábrica · revisados antes de salir
-        </p>
+          Pill horizontal compacta. Posicionada respecto al WRAPPER,
+          solo en sm+. */}
+      <div className="hidden sm:inline-flex absolute top-2 right-1 md:top-3 md:right-2 lg:top-3 lg:right-3 items-center gap-2 bg-white rounded-full shadow-lift pl-2 pr-3.5 py-1.5 md:pl-2.5 md:pr-4 md:py-2 ring-1 ring-slate-200/70">
+        <span className="inline-flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-full bg-brand-accent/15 text-brand-accent-dark shrink-0">
+          <ShieldCheck className="w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={2.25} />
+        </span>
+        <span className="text-xs md:text-sm font-semibold text-brand-ink leading-tight whitespace-nowrap">
+          Garantía de fábrica
+        </span>
       </div>
     </div>
   )
