@@ -127,90 +127,98 @@ export default function Hero() {
 
 function HeroVisual() {
   return (
-    <div className="relative aspect-[3/2] sm:aspect-[5/4] lg:aspect-[5/6] w-full max-w-md mx-auto lg:max-w-none">
-      {/* Marco / fondo */}
-      <div className="absolute inset-0 rounded-card bg-gradient-to-br from-brand-cream via-white to-amber-50/60 ring-1 ring-slate-200/70 shadow-lift" />
+    // Wrapper exterior con padding asimétrico: deja espacio fuera del card
+    // principal para que las cards flotantes (Equipos / Atención rápida)
+    // queden POR FUERA del aspect-ratio container y no tapen el grid de
+    // productos.
+    <div className="relative pt-3 pb-5 pl-2 pr-2 md:pt-4 md:pb-6 md:pl-3 md:pr-3 lg:pt-5 lg:pb-8 lg:pl-4 lg:pr-4 w-full max-w-md mx-auto lg:max-w-none">
+      {/* Card principal con aspect-ratio fijo */}
+      <div className="relative aspect-square sm:aspect-[5/4] lg:aspect-[5/6]">
+        {/* Marco / fondo */}
+        <div className="absolute inset-0 rounded-card bg-gradient-to-br from-brand-cream via-white to-amber-50/60 ring-1 ring-slate-200/70 shadow-lift" />
 
-      {/* Línea sutil de "estante" */}
-      <div className="absolute inset-x-10 bottom-1/2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent hidden sm:block" />
+        {/* Línea sutil de "estante" entre filas */}
+        <div className="absolute inset-x-10 top-1/2 -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
-      {/* Grid de electrodomésticos: 2 en mobile, 4 en desktop */}
-      <div className="absolute inset-4 md:inset-5 lg:inset-7 grid grid-cols-2 grid-rows-1 sm:grid-rows-2 gap-3 md:gap-4 lg:gap-5">
-        {hero.applianceCards.slice(0, 4).map((item, i) => {
-          const Icon = ICONS[item.icon]
-          const msg = `Hola, quiero ver precios y disponibilidad de ${item.label.toLowerCase()}.`
-          return (
-            <a
-              key={item.label}
-              href={whatsappUrl(msg)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={[
-                'group relative flex flex-col p-3 md:p-5 lg:p-6 rounded-xl bg-white',
-                'shadow-soft ring-1 ring-slate-200/70',
-                'transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-lift hover:ring-slate-300',
-                // Mobile: solo 2 cards visibles (las primeras del grid)
-                i >= 2 ? 'hidden sm:flex' : '',
-                i === 1 ? 'lg:translate-y-3' : '',
-                i === 2 ? 'lg:-translate-y-2' : '',
-              ].join(' ')}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <span className="relative inline-flex h-10 w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 items-center justify-center rounded-lg bg-brand-cream text-brand-ink ring-1 ring-slate-200/60 group-hover:bg-brand-accent group-hover:ring-brand-accent transition-colors">
-                  {Icon && <Icon className="w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8" strokeWidth={1.5} />}
-                </span>
-                {item.featured && (
-                  <span className="text-[10px] md:text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-accent text-brand-ink whitespace-nowrap">
-                    Top
+        {/* Grid 2x2 SIEMPRE: las 4 categorías visibles desde mobile */}
+        <div className="absolute inset-3 md:inset-5 lg:inset-7 grid grid-cols-2 grid-rows-2 gap-2.5 md:gap-3.5 lg:gap-5">
+          {hero.applianceCards.slice(0, 4).map((item, i) => {
+            const Icon = ICONS[item.icon]
+            const msg = `Hola, quiero ver precios y disponibilidad de ${item.label.toLowerCase()}.`
+            return (
+              <a
+                key={item.label}
+                href={whatsappUrl(msg)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={[
+                  'group relative flex flex-col p-3 md:p-4 lg:p-6 rounded-xl bg-white',
+                  'shadow-soft ring-1 ring-slate-200/70',
+                  'transition-all duration-300 ease-smooth hover:-translate-y-1 hover:shadow-lift hover:ring-slate-300',
+                  i === 1 ? 'lg:translate-y-3' : '',
+                  i === 2 ? 'lg:-translate-y-2' : '',
+                ].join(' ')}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className="relative inline-flex h-9 w-9 md:h-12 md:w-12 lg:h-16 lg:w-16 items-center justify-center rounded-lg bg-brand-cream text-brand-ink ring-1 ring-slate-200/60 group-hover:bg-brand-accent group-hover:ring-brand-accent transition-colors">
+                    {Icon && <Icon className="w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8" strokeWidth={1.5} />}
                   </span>
-                )}
-              </div>
-
-              <div className="mt-3 md:mt-4 flex-1 flex flex-col justify-end">
-                <p className="text-sm md:text-base lg:text-lg font-semibold text-brand-ink leading-tight">
-                  {item.label}
-                </p>
-                <p className="text-[11px] md:text-xs lg:text-sm text-slate-500 mt-0.5 hidden sm:block">{item.detail}</p>
-
-                <div className="mt-2 md:mt-3 flex items-center gap-1.5">
-                  <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span className="text-[11px] md:text-xs font-medium text-emerald-700">Disponible</span>
+                  {item.featured && (
+                    <span className="text-[9px] md:text-[10px] lg:text-xs font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-brand-accent text-brand-ink whitespace-nowrap">
+                      Top
+                    </span>
+                  )}
                 </div>
 
-                <p className="mt-1 md:mt-1.5 text-[11px] md:text-xs lg:text-sm font-medium text-brand-ink/70 hidden sm:block">
-                  {item.priceLabel}
-                </p>
-              </div>
-            </a>
-          )
-        })}
+                <div className="mt-2 md:mt-3 lg:mt-4 flex-1 flex flex-col justify-end">
+                  <p className="text-[13px] md:text-sm lg:text-lg font-semibold text-brand-ink leading-tight">
+                    {item.label}
+                  </p>
+                  <p className="text-[10px] md:text-[11px] lg:text-sm text-slate-500 mt-0.5 hidden md:block">{item.detail}</p>
+
+                  <div className="mt-1.5 md:mt-2 lg:mt-3 flex items-center gap-1.5">
+                    <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <span className="text-[10px] md:text-[11px] lg:text-xs font-medium text-emerald-700">Disponible</span>
+                  </div>
+
+                  <p className="mt-1 lg:mt-1.5 text-[10px] md:text-[11px] lg:text-sm font-medium text-brand-ink/70 hidden md:block">
+                    {item.priceLabel}
+                  </p>
+                </div>
+              </a>
+            )
+          })}
+        </div>
       </div>
 
-      {/* Card flotante: WhatsApp / atención */}
+      {/* Card flotante: WhatsApp / atención rápida
+          Posicionada respecto al WRAPPER exterior (no al aspect container)
+          y solo en sm+ para no tapar el grid en mobile pequeño. */}
       <a
         href={whatsappUrl('Hola, quiero información sobre electrodomésticos disponibles.')}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute -bottom-4 -left-2 md:-bottom-5 md:-left-6 bg-brand-ink text-white rounded-card shadow-lift p-3 md:p-5 max-w-[200px] md:max-w-[260px] ring-1 ring-white/5 hover:ring-emerald-400/40 transition-all duration-300 ease-smooth hover:-translate-y-1 group"
+        className="hidden sm:flex absolute bottom-0 left-0 md:bottom-1 md:left-1 lg:bottom-2 lg:left-2 bg-brand-ink text-white rounded-card shadow-lift p-3 md:p-4 lg:p-5 max-w-[210px] md:max-w-[230px] lg:max-w-[260px] ring-1 ring-white/5 hover:ring-emerald-400/40 transition-all duration-300 ease-smooth motion-safe:hover:-translate-y-1 group"
       >
-        <div className="flex items-center gap-2 md:gap-3">
-          <span className="relative inline-flex h-9 w-9 md:h-11 md:w-11 items-center justify-center rounded-lg bg-emerald-500 text-white shrink-0 group-hover:bg-emerald-400 transition-colors">
-            <MessageCircle className="w-4 h-4 md:w-6 md:h-6" />
+        <div className="flex items-center gap-2.5 md:gap-3">
+          <span className="relative inline-flex h-9 w-9 md:h-10 md:w-10 lg:h-11 lg:w-11 items-center justify-center rounded-lg bg-emerald-600 text-white shrink-0 group-hover:bg-emerald-500 transition-colors">
+            <MessageCircle className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
             <span aria-hidden className="absolute inset-0 rounded-lg ring-2 ring-emerald-400/50 motion-safe:animate-pulse" />
           </span>
           <div>
-            <p className="text-xs md:text-base font-semibold leading-tight">Atención rápida</p>
-            <p className="text-[10px] md:text-sm text-slate-300 mt-0.5">Respondemos por WhatsApp</p>
+            <p className="text-sm md:text-base font-semibold leading-tight">Atención rápida</p>
+            <p className="text-[11px] md:text-xs lg:text-sm text-slate-300 mt-0.5">Respondemos por WhatsApp</p>
           </div>
         </div>
       </a>
 
-      {/* Card flotante: equipos */}
-      <div className="absolute -top-2 -right-2 md:-top-3 md:-right-5 bg-white rounded-card shadow-lift p-3 md:p-4 ring-1 ring-slate-200/70 max-w-[170px] md:max-w-[210px]">
-        <p className="text-[9px] md:text-xs font-semibold uppercase tracking-wider text-brand-accent-dark">
+      {/* Card flotante: equipos nuevos
+          Posicionada respecto al WRAPPER, solo en sm+. */}
+      <div className="hidden sm:block absolute top-0 right-0 md:top-1 md:right-1 lg:top-2 lg:right-2 bg-white rounded-card shadow-lift p-2.5 md:p-3.5 lg:p-4 ring-1 ring-slate-200/70 max-w-[170px] md:max-w-[190px] lg:max-w-[210px]">
+        <p className="text-[10px] md:text-[11px] lg:text-xs font-semibold uppercase tracking-wider text-brand-accent-dark leading-tight">
           Equipos nuevos y revisados
         </p>
-        <p className="text-xs md:text-base font-display font-semibold text-brand-ink leading-tight mt-1 hidden sm:block">
+        <p className="text-xs md:text-sm lg:text-base font-display font-semibold text-brand-ink leading-tight mt-1 hidden md:block">
           Garantía de fábrica · revisados antes de salir
         </p>
       </div>
