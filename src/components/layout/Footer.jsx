@@ -76,9 +76,21 @@ export default function Footer() {
       </Container>
 
       <div className="border-t border-white/10">
-        <Container className="py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-400">
-          <p>© {new Date().getFullYear()} {business.name}. Todos los derechos reservados.</p>
-          <p>Hecho con cuidado para quienes compran de verdad.</p>
+        <Container className="py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-400 text-center md:text-left">
+          <p>
+            © {new Date().getFullYear()} {business.name}. Todos los derechos reservados.
+          </p>
+          <p>
+            Website by{' '}
+            <a
+              href="https://leyvawebstudio.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-slate-300 hover:text-brand-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-brand-ink rounded-sm"
+            >
+              Leyva Web Studio
+            </a>
+          </p>
         </Container>
       </div>
     </footer>
