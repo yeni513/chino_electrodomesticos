@@ -5,6 +5,7 @@ import FloatingWhatsApp from './components/ui/FloatingWhatsApp.jsx'
 import Hero from './components/sections/Hero.jsx'
 import Categorias from './components/sections/Categorias.jsx'
 import PorQueNosotros from './components/sections/PorQueNosotros.jsx'
+import ComoTrabajamos from './components/sections/ComoTrabajamos.jsx'
 import Marcas from './components/sections/Marcas.jsx'
 import Testimonios from './components/sections/Testimonios.jsx'
 import FAQ from './components/sections/FAQ.jsx'
@@ -53,6 +54,7 @@ export default function PublicSite() {
         <Suspense fallback={<DestacadosFallback />}>
           <Destacados />
         </Suspense>
+        <ComoTrabajamos />
         <PorQueNosotros />
         <Testimonios />
         <FAQ />

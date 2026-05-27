@@ -3,21 +3,18 @@ import {
   Plus,
   Loader2,
   Search,
-  Trash,
-  RotateCcw,
   Download,
   Filter,
   X,
   Archive,
-  Boxes,
-  CheckCircle2,
-  Clock3,
-  XCircle,
-  Activity,
 } from 'lucide-react'
 import AdminLayout from '../components/AdminLayout.jsx'
 import ProductList from '../components/ProductList.jsx'
 import ProductForm from '../components/ProductForm.jsx'
+import DashboardStats from '../components/DashboardStats.jsx'
+import TodayWidget from '../components/TodayWidget.jsx'
+import BulkActionsBar from '../components/BulkActionsBar.jsx'
+import TrashView from '../components/TrashView.jsx'
 import ConfirmDialog from '../ui/ConfirmDialog.jsx'
 import { useAdminProducts, useTrashProducts } from '../../supabase/useProducts.js'
 import { supabase, PRODUCTS_TABLE } from '../../supabase/client.js'
@@ -36,6 +33,14 @@ const CATEGORY_OPTIONS = [
   { value: 'otro', label: 'Otros' },
 ]
 
+const STATUS_FILTERS = [
+  { value: 'all', key: 'all' },
+  { value: 'disponible', key: 'disponible' },
+  { value: 'vendido', key: 'vendido' },
+  { value: 'agotado', key: 'agotado' },
+]
+const STATUS_LABELS = { all: 'Todos', disponible: 'Disponibles', vendido: 'Vendidos', agotado: 'Agotados' }
+
 function isToday(iso) {
   if (!iso) return false
   const d = new Date(iso)
@@ -45,6 +50,10 @@ function isToday(iso) {
     d.getMonth() === now.getMonth() &&
     d.getDate() === now.getDate()
   )
+}
+
+function labelForStatus(s) {
+  return s === 'disponible' ? 'Disponible' : s === 'vendido' ? 'Vendido' : 'Agotado'
 }
 
 export default function Dashboard() {
@@ -59,8 +68,8 @@ export default function Dashboard() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [selected, setSelected] = useState(new Set())
-  const [confirmDelete, setConfirmDelete] = useState(null) // { row } | { bulk: true }
-  const [confirmPurge, setConfirmPurge] = useState(null) // { row }
+  const [confirmDelete, setConfirmDelete] = useState(null)
+  const [confirmPurge, setConfirmPurge] = useState(null)
   const [busy, setBusy] = useState(false)
 
   const searchRef = useRef(null)
@@ -133,6 +142,7 @@ export default function Dashboard() {
     setFormOpen(true)
   }
   function openDuplicate(row) {
+    // eslint-disable-next-line no-unused-vars
     const { id, created_at, updated_at, ...rest } = row
     setEditing({ ...rest, title: `${row.title} (copia)`, status: 'disponible' })
     setFormOpen(true)
@@ -142,7 +152,6 @@ export default function Dashboard() {
     setEditing(null)
   }
 
-  // Reload + reset selección
   const reload = useCallback(() => {
     setReloadKey((k) => k + 1)
     setSelected(new Set())
@@ -162,7 +171,6 @@ export default function Dashboard() {
     })
   }
 
-  // Soft delete (single)
   async function performSoftDelete(row) {
     setBusy(true)
     const previous = rows
@@ -197,7 +205,6 @@ export default function Dashboard() {
     })
   }
 
-  // Restaurar desde papelera
   async function restoreFromTrash(row) {
     const previous = trash.rows
     trash.setRows((prev) => prev?.filter((r) => r.id !== row.id))
@@ -214,7 +221,6 @@ export default function Dashboard() {
     setReloadKey((k) => k + 1)
   }
 
-  // Hard delete desde papelera (incluye limpiar imagen del storage)
   async function purgeForever(row) {
     setBusy(true)
     const previous = trash.rows
@@ -234,7 +240,6 @@ export default function Dashboard() {
     toast.success('Producto eliminado para siempre')
   }
 
-  // Cambio rápido de estado desde la pill
   async function handleStatusChange(row, nextStatus) {
     const previous = rows
     setRows((prev) =>
@@ -252,7 +257,6 @@ export default function Dashboard() {
     toast.success(`"${row.title}" → ${labelForStatus(nextStatus)}`)
   }
 
-  // Bulk: marcar varios con un estado
   async function bulkStatusChange(nextStatus) {
     const ids = Array.from(selected)
     if (ids.length === 0) return
@@ -275,7 +279,6 @@ export default function Dashboard() {
     toast.success(`${ids.length} producto${ids.length === 1 ? '' : 's'} → ${labelForStatus(nextStatus)}`)
   }
 
-  // Bulk: soft delete
   async function bulkSoftDelete() {
     const ids = Array.from(selected)
     if (ids.length === 0) return
@@ -390,37 +393,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {view === 'inventory' && !loading && counters.all > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <StatCard icon={Boxes} label="Total" value={counters.all} tone="ink" />
-          <StatCard icon={CheckCircle2} label="Disponibles" value={counters.disponible} tone="emerald" />
-          <StatCard icon={Clock3} label="Agotados" value={counters.agotado} tone="amber" />
-          <StatCard icon={XCircle} label="Vendidos" value={counters.vendido} tone="rose" />
-        </div>
-      )}
-
-      {view === 'inventory' && !loading && (todayStats.added + todayStats.edited + todayStats.sold) > 0 && (
-        <div className="rounded-card bg-brand-ink text-white p-5 mb-6 flex items-center gap-4">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand-accent/20 text-brand-accent">
-            <Activity className="w-5 h-5" />
-          </span>
-          <div className="flex-1 text-sm">
-            <p className="font-semibold">Movimiento de hoy</p>
-            <p className="text-slate-300 mt-0.5">
-              {[
-                todayStats.added > 0 && `${todayStats.added} añadido${todayStats.added === 1 ? '' : 's'}`,
-                todayStats.edited > 0 && `${todayStats.edited} editado${todayStats.edited === 1 ? '' : 's'}`,
-                todayStats.sold > 0 && `${todayStats.sold} marcado${todayStats.sold === 1 ? '' : 's'} como vendido${todayStats.sold === 1 ? '' : 's'}`,
-              ]
-                .filter(Boolean)
-                .join(' · ')}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {view === 'inventory' && (
+      {view === 'inventory' && !loading && (
         <>
+          <DashboardStats counters={counters} />
+          <TodayWidget stats={todayStats} />
+
           <div className="flex flex-col md:flex-row md:items-center gap-3 mb-4">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -441,6 +418,7 @@ export default function Dashboard() {
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="min-h-[44px] px-3 py-2 rounded-lg bg-white ring-1 ring-slate-200 text-sm text-slate-700 focus:ring-2 focus:ring-brand-accent focus:outline-none"
               style={{ fontSize: '16px' }}
+              aria-label="Filtrar por categoría"
             >
               {CATEGORY_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -448,12 +426,7 @@ export default function Dashboard() {
             </select>
 
             <div className="flex items-center gap-1.5 overflow-x-auto -mx-1 px-1">
-              {[
-                { value: 'all', label: 'Todos', count: counters.all },
-                { value: 'disponible', label: 'Disponibles', count: counters.disponible },
-                { value: 'vendido', label: 'Vendidos', count: counters.vendido },
-                { value: 'agotado', label: 'Agotados', count: counters.agotado },
-              ].map((f) => (
+              {STATUS_FILTERS.map((f) => (
                 <button
                   key={f.value}
                   type="button"
@@ -466,9 +439,9 @@ export default function Dashboard() {
                       : 'bg-white ring-1 ring-slate-200 text-slate-700 hover:bg-slate-50',
                   ].join(' ')}
                 >
-                  {f.label}
+                  {STATUS_LABELS[f.key]}
                   <span className={statusFilter === f.value ? 'text-brand-accent' : 'text-slate-400'}>
-                    {f.count}
+                    {counters[f.key === 'all' ? 'all' : f.key]}
                   </span>
                 </button>
               ))}
@@ -476,7 +449,7 @@ export default function Dashboard() {
           </div>
 
           {showFiltersChip && (
-            <div className="mb-4 flex items-center gap-2 text-xs text-slate-500">
+            <div className="mb-4 flex items-center gap-2 text-xs text-slate-600">
               <Filter className="w-3.5 h-3.5" />
               Filtros activos · {filtered.length} resultado{filtered.length === 1 ? '' : 's'}
               <button
@@ -494,44 +467,11 @@ export default function Dashboard() {
             </div>
           )}
 
-          {selected.size > 0 && (
-            <div className="mb-4 flex flex-wrap items-center gap-2 p-3 rounded-lg bg-amber-50 ring-1 ring-amber-200">
-              <span className="text-sm font-semibold text-amber-900">
-                {selected.size} seleccionado{selected.size === 1 ? '' : 's'}
-              </span>
-              <div className="flex flex-wrap gap-1.5 ml-auto">
-                <button
-                  type="button"
-                  onClick={() => bulkStatusChange('disponible')}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-md bg-white ring-1 ring-emerald-200 text-emerald-700 text-xs font-semibold hover:bg-emerald-50"
-                >
-                  Marcar disponibles
-                </button>
-                <button
-                  type="button"
-                  onClick={() => bulkStatusChange('vendido')}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-md bg-white ring-1 ring-rose-200 text-rose-700 text-xs font-semibold hover:bg-rose-50"
-                >
-                  Marcar vendidos
-                </button>
-                <button
-                  type="button"
-                  onClick={() => bulkStatusChange('agotado')}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-md bg-white ring-1 ring-amber-200 text-amber-700 text-xs font-semibold hover:bg-amber-50"
-                >
-                  Marcar agotados
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirmDelete({ bulk: true })}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-md bg-white ring-1 ring-rose-300 text-rose-700 text-xs font-semibold hover:bg-rose-50"
-                >
-                  <Trash className="w-3.5 h-3.5" />
-                  Borrar seleccionados
-                </button>
-              </div>
-            </div>
-          )}
+          <BulkActionsBar
+            count={selected.size}
+            onMark={bulkStatusChange}
+            onDelete={() => setConfirmDelete({ bulk: true })}
+          />
 
           {loading ? (
             <div className="rounded-card bg-white ring-1 ring-slate-200 p-10 flex items-center justify-center gap-2 text-slate-500">
@@ -552,7 +492,7 @@ export default function Dashboard() {
                 showFiltersChip
                   ? {
                       title: 'Sin resultados',
-                      body: `No encontramos productos con esos filtros. Prueba a limpiarlos.`,
+                      body: 'No encontramos productos con esos filtros. Prueba a limpiarlos.',
                     }
                   : undefined
               }
@@ -610,89 +550,5 @@ export default function Dashboard() {
         onConfirm={() => confirmPurge?.row && purgeForever(confirmPurge.row)}
       />
     </AdminLayout>
-  )
-}
-
-function labelForStatus(s) {
-  return s === 'disponible' ? 'Disponible' : s === 'vendido' ? 'Vendido' : 'Agotado'
-}
-
-const TONE_STYLES = {
-  ink: 'bg-brand-ink text-white',
-  emerald: 'bg-white ring-1 ring-emerald-200 text-emerald-700',
-  amber: 'bg-white ring-1 ring-amber-200 text-amber-800',
-  rose: 'bg-white ring-1 ring-rose-200 text-rose-700',
-}
-
-function StatCard({ icon: Icon, label, value, tone }) {
-  return (
-    <div className={`rounded-card p-4 flex items-center gap-3 ${TONE_STYLES[tone] || ''}`}>
-      <Icon className="w-5 h-5 opacity-80" />
-      <div>
-        <p className="text-[10px] uppercase tracking-wider opacity-80 font-semibold">{label}</p>
-        <p className="text-xl font-display font-semibold tabular-nums leading-tight">{value}</p>
-      </div>
-    </div>
-  )
-}
-
-function TrashView({ loading, rows, onRestore, onPurge }) {
-  if (loading) {
-    return (
-      <div className="rounded-card bg-white ring-1 ring-slate-200 p-10 flex items-center justify-center gap-2 text-slate-500">
-        <Loader2 className="w-5 h-5 animate-spin" />
-        Cargando papelera…
-      </div>
-    )
-  }
-  if (!rows || rows.length === 0) {
-    return (
-      <div className="rounded-card bg-white ring-1 ring-slate-200 p-10 text-center">
-        <Archive className="w-8 h-8 mx-auto text-slate-300" />
-        <h3 className="mt-4 font-display font-semibold text-lg text-brand-ink">Papelera vacía</h3>
-        <p className="mt-2 text-sm text-slate-500">
-          Los productos que borres aparecen aquí. Puedes restaurarlos o eliminarlos para siempre.
-        </p>
-      </div>
-    )
-  }
-  return (
-    <div className="rounded-card bg-white ring-1 ring-slate-200 overflow-hidden">
-      <ul className="divide-y divide-slate-100">
-        {rows.map((row) => (
-          <li key={row.id} className="flex flex-col md:flex-row md:items-center gap-4 px-4 md:px-5 py-4">
-            <div className="w-16 h-16 rounded-lg bg-slate-100 ring-1 ring-slate-200 overflow-hidden shrink-0">
-              {row.image_url ? (
-                <img src={row.image_url} alt={row.title} className="w-full h-full object-cover" loading="lazy" />
-              ) : null}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-display font-semibold text-base text-brand-ink leading-tight">{row.title}</p>
-              <p className="mt-1 text-xs text-slate-500">
-                Borrado el {new Date(row.deleted_at).toLocaleString('es-419')}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => onRestore(row)}
-                className="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-lg ring-1 ring-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                Restaurar
-              </button>
-              <button
-                type="button"
-                onClick={() => onPurge(row)}
-                className="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-lg bg-rose-50 text-rose-700 text-xs font-semibold hover:bg-rose-100"
-              >
-                <Trash className="w-3.5 h-3.5" />
-                Eliminar para siempre
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
   )
 }

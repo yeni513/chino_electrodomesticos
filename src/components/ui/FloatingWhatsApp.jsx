@@ -16,10 +16,10 @@ export default function FloatingWhatsApp() {
       {/* Pulse halo */}
       <span
         aria-hidden
-        className="absolute inset-0 rounded-full bg-emerald-500/40 animate-ping"
+        className="absolute inset-0 rounded-full bg-emerald-500/40 motion-safe:animate-ping"
       />
       {/* Botón */}
-      <span className="relative inline-flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lift ring-4 ring-white hover:bg-emerald-600 hover:scale-105 transition-all duration-300 ease-smooth focus-visible:outline-none focus-visible:ring-emerald-300">
+      <span className="relative inline-flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-full bg-emerald-600 text-white shadow-lift ring-4 ring-white hover:bg-emerald-700 hover:scale-105 transition-all duration-300 ease-smooth focus-visible:outline-none focus-visible:ring-emerald-300">
         <MessageCircle className="w-7 h-7 md:w-8 md:h-8" strokeWidth={2} />
       </span>
       {/* Tooltip desktop */}

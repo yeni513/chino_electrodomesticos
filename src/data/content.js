@@ -83,7 +83,7 @@ export const hero = {
   subhead:
     'Equipos revisados y entregados a tu casa por la misma persona que te asesora. Precio final por WhatsApp, sin call center ni cargos sorpresa.',
   primaryCta: { label: 'Ver lo disponible esta semana', href: '#destacados' },
-  secondaryCta: { label: 'Preguntar por WhatsApp', href: 'whatsapp-direct' },
+  secondaryCta: { label: 'Ver opciones para mi presupuesto', href: 'whatsapp-direct' },
   microcopy:
     'Te respondemos en horario de tienda con fotos, precio final y disponibilidad real — sin formularios ni esperas.',
   categoryChips: [
@@ -91,11 +91,6 @@ export const hero = {
     { icon: 'WashingMachine', label: 'Lavadoras' },
     { icon: 'Shirt', label: 'Secadoras' },
     { icon: 'Flame', label: 'Estufas' },
-  ],
-  trustBullets: [
-    'Entrega coordinada en Cleveland',
-    'Equipos revisados antes de salir',
-    'Precio final por WhatsApp',
   ],
   applianceCards: [
     {
@@ -209,64 +204,16 @@ export const destacadosIntro = {
     'Muestra del inventario actual. Pídenos fotos extra, video o el precio final por WhatsApp — el stock cambia rápido.',
 }
 
-// Fallback mostrado solo si la tabla de productos en Supabase está vacía.
-export const destacados = [
-  {
-    id: 1,
-    name: 'Refrigerador No Frost 320 L',
-    spec: 'Doble puerta · 320 L · clase A',
-    detail: '220 V · dispensador interior · congelador superior',
-    price: 'Consultar precio',
-    badge: 'Más consultado',
-    image: null,
-    chips: [
-      { icon: 'CheckCircle2', label: 'Disponible', tone: 'success' },
-      { icon: 'PackageCheck', label: 'Revisado', tone: 'neutral' },
-      { icon: 'Truck', label: 'Entrega coordinada', tone: 'neutral' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Lavadora carga frontal 9 kg',
-    spec: '9 kg · 1.400 rpm · 14 programas',
-    detail: 'Motor inverter · vapor · clase A',
-    price: 'Consultar precio',
-    badge: 'Recomendado',
-    image: null,
-    chips: [
-      { icon: 'CheckCircle2', label: 'Disponible', tone: 'success' },
-      { icon: 'PackageCheck', label: 'Revisado', tone: 'neutral' },
-      { icon: 'Truck', label: 'Entrega coordinada', tone: 'neutral' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Secadora de ropa 8 kg',
-    spec: '8 kg · bomba de calor · clase A++',
-    detail: 'Antiarrugas · sensor de humedad · panel táctil',
-    price: 'Consultar precio',
-    badge: 'Nuevo modelo',
-    image: null,
-    chips: [
-      { icon: 'Clock3', label: 'Consultar disponibilidad', tone: 'warning' },
-      { icon: 'PackageCheck', label: 'Revisado', tone: 'neutral' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Estufa 4 quemadores con horno',
-    spec: 'Gas natural / GLP · 4 quemadores',
-    detail: 'Horno 65 L · encendido eléctrico · acero inoxidable',
-    price: 'Consultar precio',
-    badge: 'Más vendido',
-    image: null,
-    chips: [
-      { icon: 'CheckCircle2', label: 'Disponible', tone: 'success' },
-      { icon: 'PackageCheck', label: 'Revisado', tone: 'neutral' },
-      { icon: 'Truck', label: 'Entrega coordinada', tone: 'neutral' },
-    ],
-  },
-]
+// Empty state honesto que se muestra si la tabla de productos en Supabase
+// está vacía. Sin badges fake ni precios inventados.
+export const destacadosEmptyState = {
+  title: 'Estamos actualizando el inventario',
+  body:
+    'Escríbenos por WhatsApp y te enviamos lo disponible hoy con fotos y precio final. Solemos responder en minutos durante el horario de tienda.',
+  ctaLabel: 'Pedir lo disponible por WhatsApp',
+  ctaMessage:
+    'Hola, ¿qué tienen disponible esta semana? Busco principalmente: ___',
+}
 
 export const marcas = [
   'Whirlpool',

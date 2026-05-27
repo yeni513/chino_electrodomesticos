@@ -62,7 +62,7 @@ export default function CTAFinal() {
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white text-base md:text-lg font-semibold shadow-lift transition-all duration-300 ease-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-ink hover:-translate-y-0.5"
+                  className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-base md:text-lg font-semibold shadow-lift transition-all duration-300 ease-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-ink hover:-translate-y-0.5"
                 >
                   <span
                     aria-hidden
@@ -84,7 +84,7 @@ export default function CTAFinal() {
                 )}
               </div>
 
-              <p className="mt-3 text-xs text-slate-400 flex items-center gap-1.5">
+              <p className="mt-3 text-xs text-slate-300 flex items-center gap-1.5">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 {ctaFinal.reassuranceUnderCta}
               </p>
@@ -95,7 +95,7 @@ export default function CTAFinal() {
               <div className="relative max-w-sm mx-auto lg:ml-auto lg:mr-0">
                 <div className="bg-white/[0.06] backdrop-blur-md rounded-card ring-1 ring-white/15 p-6 shadow-lift">
                   <div className="flex items-center gap-3 pb-4 border-b border-white/10">
-                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-500 text-white">
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-600 text-white">
                       <MessageCircle className="w-5 h-5" />
                     </span>
                     <div>

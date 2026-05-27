@@ -2,7 +2,9 @@ import { cloneElement, isValidElement, useEffect, useId, useRef, useState } from
 import { X, Loader2, Save } from 'lucide-react'
 import { supabase, PRODUCTS_TABLE } from '../../supabase/client.js'
 import ProductImageUpload from './ProductImageUpload.jsx'
+import ConfirmDialog from '../ui/ConfirmDialog.jsx'
 import { useToast } from '../lib/toast.jsx'
+import { useFocusTrap } from '../../lib/useFocusTrap.js'
 
 const CATEGORIES = [
   { value: 'lavadora', label: 'Lavadora' },
@@ -58,12 +60,16 @@ export default function ProductForm({ product, onClose, onSaved }) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const [dirty, setDirty] = useState(false)
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false)
   const initialRef = useRef(values)
   const titleRef = useRef(null)
+  const containerRef = useRef(null)
   const toast = useToast()
   const titleId = useId()
 
   const isEditing = !!product?.id
+
+  useFocusTrap(true, containerRef)
 
   // Reset al cambiar producto (abrir Editar tras Editar otro).
   useEffect(() => {
@@ -114,8 +120,8 @@ export default function ProductForm({ product, onClose, onSaved }) {
   function attemptClose() {
     if (saving) return
     if (dirty) {
-      const ok = window.confirm('Tienes cambios sin guardar. ¿Cerrar de todos modos?')
-      if (!ok) return
+      setShowCloseConfirm(true)
+      return
     }
     onClose?.()
   }
@@ -181,6 +187,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
 
   return (
     <div
+      ref={containerRef}
       className="fixed inset-0 z-50 flex items-stretch md:items-center justify-center bg-brand-ink/50 backdrop-blur-sm overflow-y-auto"
       role="dialog"
       aria-modal="true"
@@ -365,6 +372,20 @@ export default function ProductForm({ product, onClose, onSaved }) {
           </div>
         </form>
       </div>
+
+      <ConfirmDialog
+        open={showCloseConfirm}
+        title="¿Cerrar sin guardar?"
+        description="Tienes cambios sin guardar. Se perderán si cierras ahora."
+        confirmLabel="Sí, cerrar"
+        cancelLabel="Seguir editando"
+        tone="warn"
+        onCancel={() => setShowCloseConfirm(false)}
+        onConfirm={() => {
+          setShowCloseConfirm(false)
+          onClose?.()
+        }}
+      />
     </div>
   )
 }

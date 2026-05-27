@@ -9,6 +9,7 @@ import {
   ACCEPTED_TYPES,
 } from '../lib/imageUtils.js'
 import { useToast } from '../lib/toast.jsx'
+import { srcAt } from '../../lib/imgUrl.js'
 
 export default function ProductImageUpload({ value, onChange, productName }) {
   const inputRef = useRef(null)
@@ -78,7 +79,12 @@ export default function ProductImageUpload({ value, onChange, productName }) {
       <div className="flex items-start gap-4">
         {value ? (
           <div className="relative w-32 h-32 rounded-lg overflow-hidden ring-1 ring-slate-200 bg-slate-100 shrink-0">
-            <img src={value} alt="Vista previa" className="w-full h-full object-cover" />
+            <img
+              src={srcAt(value, { width: 256 })}
+              alt="Vista previa"
+              className="w-full h-full object-cover"
+              decoding="async"
+            />
           </div>
         ) : (
           <div className="w-32 h-32 rounded-lg ring-1 ring-dashed ring-slate-300 bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">

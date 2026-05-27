@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { AlertTriangle, Loader2 } from 'lucide-react'
+import { useFocusTrap } from '../../lib/useFocusTrap.js'
 
 const TONES = {
   danger: {
@@ -28,6 +29,8 @@ export default function ConfirmDialog({
   onCancel,
 }) {
   const confirmRef = useRef(null)
+  const containerRef = useRef(null)
+  useFocusTrap(open, containerRef)
 
   useEffect(() => {
     if (!open) return
@@ -45,6 +48,7 @@ export default function ConfirmDialog({
 
   return (
     <div
+      ref={containerRef}
       className="fixed inset-0 z-[80] flex items-center justify-center bg-brand-ink/50 backdrop-blur-sm px-4"
       role="dialog"
       aria-modal="true"

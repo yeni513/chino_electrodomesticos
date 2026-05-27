@@ -9,6 +9,7 @@ import {
   ChevronDown,
   Check,
 } from 'lucide-react'
+import { srcAt } from '../../lib/imgUrl.js'
 
 const CATEGORY_LABEL = {
   lavadora: 'Lavadora',
@@ -123,7 +124,13 @@ export default function ProductList({
               {/* Imagen */}
               <div className="w-20 h-20 md:w-16 md:h-16 rounded-lg bg-slate-100 ring-1 ring-slate-200 overflow-hidden shrink-0">
                 {row.image_url ? (
-                  <img src={row.image_url} alt={row.title} className="w-full h-full object-cover" loading="lazy" />
+                  <img
+                    src={srcAt(row.image_url, { width: 160 })}
+                    alt={row.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-slate-400">
                     <Package className="w-7 h-7" strokeWidth={1.25} />
