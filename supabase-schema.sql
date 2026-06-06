@@ -33,7 +33,8 @@ create table if not exists public.products (
   color               text,
   condition           text,
   short_description   text,
-  image_url           text,
+  image_url           text,            -- portada (= images[0])
+  images              text[] not null default '{}',  -- galería de fotos
 
   featured            boolean not null default false,
   delivery_available  boolean not null default true,
@@ -43,6 +44,10 @@ create table if not exists public.products (
 -- Migración idempotente: añade `deleted_at` si la columna no existe.
 alter table public.products
   add column if not exists deleted_at timestamptz;
+
+-- Migración idempotente: añade `images` (galería) si no existe.
+alter table public.products
+  add column if not exists images text[] not null default '{}';
 
 create index if not exists products_status_idx       on public.products (status);
 create index if not exists products_featured_idx     on public.products (featured);

@@ -31,7 +31,7 @@ const EMPTY = {
   color: '',
   condition: '',
   short_description: '',
-  image_url: '',
+  images: [],
   featured: false,
   delivery_available: true,
   sort_order: '',
@@ -39,6 +39,12 @@ const EMPTY = {
 
 function buildInitialValues(product) {
   if (!product) return EMPTY
+  const images =
+    Array.isArray(product.images) && product.images.length
+      ? product.images
+      : product.image_url
+        ? [product.image_url]
+        : []
   return {
     title: product.title || '',
     category: product.category || 'lavadora',
@@ -48,7 +54,7 @@ function buildInitialValues(product) {
     color: product.color || '',
     condition: product.condition || '',
     short_description: product.short_description || '',
-    image_url: product.image_url || '',
+    images,
     featured: !!product.featured,
     delivery_available: product.delivery_available !== false,
     sort_order: product.sort_order ?? '',
@@ -131,6 +137,7 @@ export default function ProductForm({ product, onClose, onSaved }) {
     setError(null)
     setSaving(true)
 
+    const gallery = (values.images || []).filter(Boolean)
     const payload = {
       title: values.title.trim(),
       category: values.category,
@@ -140,7 +147,8 @@ export default function ProductForm({ product, onClose, onSaved }) {
       color: values.color.trim() || null,
       condition: values.condition.trim() || null,
       short_description: values.short_description.trim() || null,
-      image_url: values.image_url || null,
+      image_url: gallery[0] || null,
+      images: gallery,
       featured: !!values.featured,
       delivery_available: !!values.delivery_available,
       sort_order: values.sort_order === '' || values.sort_order == null ? null : Number(values.sort_order),
@@ -152,20 +160,23 @@ export default function ProductForm({ product, onClose, onSaved }) {
       return
     }
 
-    let response
-    if (isEditing) {
-      response = await supabase
-        .from(PRODUCTS_TABLE)
-        .update(payload)
-        .eq('id', product.id)
-        .select()
-        .single()
-    } else {
-      response = await supabase
-        .from(PRODUCTS_TABLE)
-        .insert(payload)
-        .select()
-        .single()
+    // Guarda; si la columna `images` aún no existe en la BD (migración no
+    // corrida), reintenta sin ella para no bloquear el guardado.
+    async function save(body) {
+      if (isEditing) {
+        return supabase.from(PRODUCTS_TABLE).update(body).eq('id', product.id).select().single()
+      }
+      return supabase.from(PRODUCTS_TABLE).insert(body).select().single()
+    }
+
+    let response = await save(payload)
+    const missingImages =
+      response.error &&
+      /images/i.test(response.error.message || '') &&
+      /(column|schema cache|does not exist|find)/i.test(response.error.message || '')
+    if (missingImages) {
+      const { images: _omit, ...withoutImages } = payload
+      response = await save(withoutImages)
     }
 
     setSaving(false)
@@ -316,9 +327,9 @@ export default function ProductForm({ product, onClose, onSaved }) {
           </Field>
 
           <ProductImageUpload
-            value={values.image_url}
-            onChange={(url) => {
-              setValues((v) => ({ ...v, image_url: url }))
+            value={values.images}
+            onChange={(arr) => {
+              setValues((v) => ({ ...v, images: arr }))
               setDirty(true)
             }}
             productName={values.title}

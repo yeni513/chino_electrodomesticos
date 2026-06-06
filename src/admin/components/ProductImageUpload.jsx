@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Image as ImageIcon, Upload, Loader2, Trash2 } from 'lucide-react'
+import { Image as ImageIcon, Upload, Loader2, Trash2, Star } from 'lucide-react'
 import { supabase, PRODUCT_IMAGES_BUCKET } from '../../supabase/client.js'
 import {
   compressImage,
@@ -11,128 +11,159 @@ import {
 import { useToast } from '../lib/toast.jsx'
 import { srcAt } from '../../lib/imgUrl.js'
 
+const MAX_IMAGES = 8
+
+// Galería de fotos del producto. `value` es un array de URLs; la primera es la
+// portada. Permite subir varias, elegir portada y quitar.
 export default function ProductImageUpload({ value, onChange, productName }) {
+  const images = Array.isArray(value) ? value : value ? [value] : []
   const inputRef = useRef(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState(null)
   const toast = useToast()
 
-  async function handleFile(rawFile) {
-    if (!rawFile) return
-    setError(null)
-
+  async function uploadOne(rawFile) {
     const validationError = validateImageFile(rawFile)
     if (validationError) {
-      setError(validationError)
-      toast.error('Imagen no válida', { description: validationError })
-      if (inputRef.current) inputRef.current.value = ''
-      return
+      throw new Error(validationError)
     }
-
-    setUploading(true)
-
-    const previousUrl = value
     const file = await compressImage(rawFile)
     const ext = (file.name.split('.').pop() || 'webp').toLowerCase()
     const id = crypto.randomUUID()
-    const path = `products/${slugify(productName)}-${id}.${ext}`
-
+    const path = `products/${slugify(productName) || 'producto'}-${id}.${ext}`
     const { error: uploadError } = await supabase.storage
       .from(PRODUCT_IMAGES_BUCKET)
       .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type })
+    if (uploadError) throw new Error(uploadError.message || 'No se pudo subir la imagen.')
+    const { data } = supabase.storage.from(PRODUCT_IMAGES_BUCKET).getPublicUrl(path)
+    return data.publicUrl
+  }
 
-    if (uploadError) {
-      setUploading(false)
-      const msg = uploadError.message || 'No se pudo subir la imagen.'
-      setError(msg)
-      toast.error('Error al subir la imagen', { description: msg })
+  async function handleFiles(fileList) {
+    const files = Array.from(fileList || [])
+    if (files.length === 0) return
+    setError(null)
+
+    const room = MAX_IMAGES - images.length
+    if (room <= 0) {
+      toast.info(`Máximo ${MAX_IMAGES} fotos por producto`)
+      if (inputRef.current) inputRef.current.value = ''
       return
     }
+    const toUpload = files.slice(0, room)
 
-    const { data } = supabase.storage.from(PRODUCT_IMAGES_BUCKET).getPublicUrl(path)
-
-    // Best-effort cleanup de la imagen previa para evitar storage bloat.
-    if (previousUrl) {
-      deleteStorageObjectByPublicUrl(previousUrl).catch(() => {})
+    setUploading(true)
+    const uploaded = []
+    for (const f of toUpload) {
+      try {
+        uploaded.push(await uploadOne(f))
+      } catch (e) {
+        setError(e.message)
+        toast.error('Imagen no subida', { description: e.message })
+      }
     }
-
     setUploading(false)
-    onChange(data.publicUrl)
+    if (uploaded.length) {
+      onChange([...images, ...uploaded])
+      toast.success(uploaded.length === 1 ? 'Foto agregada' : `${uploaded.length} fotos agregadas`)
+    }
     if (inputRef.current) inputRef.current.value = ''
   }
 
-  function handleRemove() {
-    const previousUrl = value
-    onChange('')
-    if (inputRef.current) inputRef.current.value = ''
-    if (previousUrl) {
-      deleteStorageObjectByPublicUrl(previousUrl).catch(() => {})
-    }
+  function removeAt(url) {
+    onChange(images.filter((u) => u !== url))
+    deleteStorageObjectByPublicUrl(url).catch(() => {})
+  }
+
+  function makeCover(url) {
+    onChange([url, ...images.filter((u) => u !== url)])
   }
 
   return (
     <div>
       <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
-        Foto del producto
+        Fotos del producto{' '}
+        <span className="text-slate-400 normal-case font-normal">
+          ({images.length}/{MAX_IMAGES} · la primera es la portada)
+        </span>
       </label>
 
-      <div className="flex items-start gap-4">
-        {value ? (
-          <div className="relative w-32 h-32 rounded-lg overflow-hidden ring-1 ring-slate-200 bg-slate-100 shrink-0">
+      <div className="flex flex-wrap gap-3">
+        {images.map((url, i) => (
+          <div
+            key={url}
+            className="relative w-28 h-28 rounded-lg overflow-hidden ring-1 ring-slate-200 bg-slate-100 group"
+          >
             <img
-              src={srcAt(value, { width: 256 })}
-              alt="Vista previa"
+              src={srcAt(url, { width: 256 })}
+              alt={`Foto ${i + 1}`}
               className="w-full h-full object-cover"
               decoding="async"
             />
-          </div>
-        ) : (
-          <div className="w-32 h-32 rounded-lg ring-1 ring-dashed ring-slate-300 bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
-            <ImageIcon className="w-7 h-7" strokeWidth={1.5} />
-          </div>
-        )}
-
-        <div className="flex-1 min-w-0">
-          <input
-            ref={inputRef}
-            type="file"
-            accept={ACCEPTED_TYPES.join(',')}
-            onChange={(e) => handleFile(e.target.files?.[0])}
-            className="hidden"
-          />
-
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
-              disabled={uploading}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand-ink text-white text-xs font-semibold hover:bg-slate-800 transition-colors disabled:opacity-60 min-h-[44px]"
-            >
-              {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-              {uploading ? 'Subiendo…' : value ? 'Reemplazar' : 'Subir foto'}
-            </button>
-
-            {value && !uploading && (
+            {i === 0 ? (
+              <span className="absolute top-1 left-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-brand-ink text-white text-[10px] font-semibold">
+                <Star className="w-2.5 h-2.5 fill-current" />
+                Portada
+              </span>
+            ) : (
               <button
                 type="button"
-                onClick={handleRemove}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-rose-700 text-xs font-semibold hover:bg-rose-50 transition-colors min-h-[44px]"
+                onClick={() => makeCover(url)}
+                title="Usar como portada"
+                className="absolute top-1 left-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/90 text-brand-ink text-[10px] font-semibold opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
               >
-                <Trash2 className="w-3.5 h-3.5" />
-                Quitar
+                <Star className="w-2.5 h-2.5" />
+                Portada
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => removeAt(url)}
+              title="Quitar foto"
+              className="absolute top-1 right-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
+              aria-label="Quitar foto"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
           </div>
+        ))}
 
-          <p className="mt-3 text-xs text-slate-500 leading-relaxed">
-            JPG, PNG o WebP · máximo 5 MB. Se comprime y reescala automáticamente a 1600 px.
-          </p>
-
-          {error && (
-            <p className="mt-2 text-xs text-rose-700">{error}</p>
-          )}
-        </div>
+        {images.length < MAX_IMAGES && (
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={uploading}
+            className="w-28 h-28 rounded-lg ring-1 ring-dashed ring-slate-300 bg-slate-50 flex flex-col items-center justify-center gap-1.5 text-slate-500 hover:bg-slate-100 hover:ring-brand-ink transition-colors disabled:opacity-60"
+          >
+            {uploading ? (
+              <Loader2 className="w-6 h-6 animate-spin" />
+            ) : images.length === 0 ? (
+              <ImageIcon className="w-6 h-6" strokeWidth={1.5} />
+            ) : (
+              <Upload className="w-6 h-6" strokeWidth={1.5} />
+            )}
+            <span className="text-[11px] font-semibold">
+              {uploading ? 'Subiendo…' : images.length === 0 ? 'Subir fotos' : 'Agregar'}
+            </span>
+          </button>
+        )}
       </div>
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept={ACCEPTED_TYPES.join(',')}
+        multiple
+        onChange={(e) => handleFiles(e.target.files)}
+        className="hidden"
+      />
+
+      <p className="mt-3 text-xs text-slate-500 leading-relaxed">
+        JPG, PNG o WebP · máx 5 MB c/u. Se comprimen a 1600 px. Puedes subir varias a la vez;
+        arrastra el ratón sobre una foto para elegir portada o quitarla.
+      </p>
+
+      {error && <p className="mt-2 text-xs text-rose-700">{error}</p>}
     </div>
   )
 }

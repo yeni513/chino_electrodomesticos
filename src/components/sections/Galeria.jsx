@@ -35,13 +35,14 @@ export default function Galeria() {
 
   // Fotos reales del admin (con imagen) + curadas de respaldo, sin las rotas.
   const images = useMemo(() => {
-    const real = (products || [])
-      .filter((p) => p.image)
-      .map((p) => ({
-        src: srcAt(p.image, { width: 800 }),
+    const real = (products || []).flatMap((p) => {
+      const gallery = p.images?.length ? p.images : p.image ? [p.image] : []
+      return gallery.map((src) => ({
+        src: srcAt(src, { width: 800 }),
         title: p.name,
         category: CAT_LABEL[p.category] || 'Otros',
       }))
+    })
     const seen = new Set()
     return [...real, ...CURATED].filter((img) => {
       if (broken.has(img.src) || seen.has(img.src)) return false

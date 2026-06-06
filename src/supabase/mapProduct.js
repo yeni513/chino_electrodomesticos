@@ -50,6 +50,12 @@ function buildSpec(row) {
 }
 
 export function mapSupabaseProduct(row) {
+  // Galería: usa `images` si existe, si no cae a [image_url]. La portada es
+  // images[0] (o image_url). Filtra vacíos por si acaso.
+  const gallery = (Array.isArray(row.images) ? row.images : []).filter(Boolean)
+  if (gallery.length === 0 && row.image_url) gallery.push(row.image_url)
+  const cover = row.image_url || gallery[0] || null
+
   return {
     id: row.id,
     name: row.title,
@@ -59,7 +65,8 @@ export function mapSupabaseProduct(row) {
     price: formatPrice(row.price),
     status: row.status,
     badge: buildBadge(row),
-    image: row.image_url || null,
+    image: cover,
+    images: gallery,
     featured: !!row.featured,
     deliveryAvailable: !!row.delivery_available,
     chips: buildChips(row),
