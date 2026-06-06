@@ -33,6 +33,10 @@ export default function Header() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
+  // atTop = sobre el hero oscuro (sin scroll, menú cerrado) → header transparente,
+  // logo en chip blanco y navegación en blanco. Al hacer scroll → header sólido.
+  const atTop = !scrolled && !open
+
   return (
     <>
       <header
@@ -45,20 +49,29 @@ export default function Header() {
             ? 'bg-white border-b border-slate-200/70'
             : scrolled
               ? 'bg-white/90 backdrop-blur-md border-b border-slate-200/70 shadow-soft'
-              : 'bg-white/40 backdrop-blur-sm border-b border-transparent',
+              : 'bg-transparent border-b border-transparent',
         ].join(' ')}
       >
         <Container className="flex items-center justify-between h-16 md:h-24">
           <a href="#top" className="flex items-center group" aria-label={business.name}>
-            <img
-              src={brand.assets.logo}
-              alt={business.name}
-              width="260"
-              height="78"
-              fetchPriority="high"
-              decoding="async"
-              className="h-[44px] lg:h-[78px] w-auto max-w-[160px] lg:max-w-[260px] object-contain"
-            />
+            <span
+              className={[
+                'inline-flex items-center transition-all duration-300 ease-smooth',
+                atTop
+                  ? 'bg-white rounded-lg px-2.5 py-1 md:px-3 md:py-1.5 shadow-lift ring-1 ring-white/10'
+                  : '',
+              ].join(' ')}
+            >
+              <img
+                src={brand.assets.logo}
+                alt={business.name}
+                width="260"
+                height="78"
+                fetchPriority="high"
+                decoding="async"
+                className="h-[40px] lg:h-[64px] w-auto max-w-[150px] lg:max-w-[230px] object-contain"
+              />
+            </span>
           </a>
 
           <nav className="hidden lg:flex items-center gap-8">
@@ -66,7 +79,12 @@ export default function Header() {
               <a
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium text-slate-700 hover:text-brand-ink transition-colors"
+                className={[
+                  'text-sm font-medium transition-colors',
+                  atTop
+                    ? 'text-white/90 hover:text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.3)]'
+                    : 'text-slate-700 hover:text-brand-ink',
+                ].join(' ')}
               >
                 {item.label}
               </a>
@@ -91,7 +109,12 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-lg text-brand-ink hover:bg-slate-100 transition-colors"
+            className={[
+              'lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-lg transition-colors',
+              atTop
+                ? 'text-white hover:bg-white/10'
+                : 'text-brand-ink hover:bg-slate-100',
+            ].join(' ')}
             aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={open}
             aria-controls="mobile-menu"

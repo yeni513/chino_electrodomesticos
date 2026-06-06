@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import Container from '../layout/Container.jsx'
 import Button from '../ui/Button.jsx'
+import Reveal from '../ui/Reveal.jsx'
 import { destacadosIntro, destacadosEmptyState } from '../../data/content.js'
 import { whatsappUrl } from '../../lib/whatsapp.js'
 import { useProducts } from '../../supabase/useProducts.js'
@@ -30,6 +31,14 @@ const BADGE_TONES = {
   soldout: 'bg-amber-500 text-brand-ink ring-amber-500',
 }
 
+// Imágenes reales para el empty state (mientras el inventario está vacío).
+const EMPTY_STATE_PRODUCTS = [
+  { src: '/products/refrigerador.webp', alt: 'Refrigerador disponible en Trusted Appliances' },
+  { src: '/products/lavadora.webp', alt: 'Lavadora disponible en Trusted Appliances' },
+  { src: '/products/estufa.webp', alt: 'Estufa disponible en Trusted Appliances' },
+  { src: '/products/secadora.webp', alt: 'Secadora disponible en Trusted Appliances' },
+]
+
 export default function Destacados() {
   const { products: cmsProducts, loading } = useProducts()
   const isEmpty = !loading && (!cmsProducts || cmsProducts.length === 0)
@@ -38,7 +47,7 @@ export default function Destacados() {
     <section id="destacados" className="section-y bg-brand-cream/60">
       <Container>
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-          <div className="max-w-3xl">
+          <Reveal className="max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-wider text-brand-accent-dark">
               {destacadosIntro.eyebrow}
             </p>
@@ -48,7 +57,7 @@ export default function Destacados() {
             <p className="mt-5 md:mt-6 text-lg md:text-xl text-slate-600 leading-relaxed">
               {destacadosIntro.subhead}
             </p>
-          </div>
+          </Reveal>
           {!isEmpty && (
             <Button
               as="a"
@@ -69,8 +78,10 @@ export default function Destacados() {
         ) : (
           <>
             <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7 lg:gap-8">
-              {(cmsProducts || []).slice(0, 8).map((p) => (
-                <ProductCard key={p.id} product={p} />
+              {(cmsProducts || []).slice(0, 8).map((p, i) => (
+                <Reveal key={p.id} variant="up" delay={(i % 4) * 80}>
+                  <ProductCard product={p} />
+                </Reveal>
               ))}
             </div>
 
@@ -86,7 +97,7 @@ export default function Destacados() {
 
 function EmptyState() {
   return (
-    <div className="mt-12 md:mt-14 rounded-card bg-white ring-1 ring-slate-200/70 shadow-soft p-8 md:p-12 lg:p-14">
+    <Reveal variant="up" className="mt-12 md:mt-14 rounded-card bg-white ring-1 ring-slate-200/70 shadow-soft p-8 md:p-12 lg:p-14">
       <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         <div className="lg:col-span-7">
           <span className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-brand-accent/15 text-brand-accent-dark">
@@ -112,20 +123,24 @@ function EmptyState() {
         </div>
         <div className="lg:col-span-5">
           <div className="grid grid-cols-2 gap-3">
-            {Object.entries(CATEGORY_ICON)
-              .slice(0, 4)
-              .map(([cat, Icon]) => (
-                <div
-                  key={cat}
-                  className="aspect-square rounded-xl bg-gradient-to-br from-brand-cream via-white to-amber-50/40 ring-1 ring-slate-200/60 flex items-center justify-center"
-                >
-                  <Icon className="w-12 h-12 md:w-14 md:h-14 text-brand-ink/40" strokeWidth={1.25} />
-                </div>
-              ))}
+            {EMPTY_STATE_PRODUCTS.map((item) => (
+              <div
+                key={item.src}
+                className="aspect-square rounded-xl bg-gradient-to-b from-slate-50 to-brand-cream ring-1 ring-slate-200/60 overflow-hidden"
+              >
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
-    </div>
+    </Reveal>
   )
 }
 

@@ -133,6 +133,7 @@ export const categorias = [
     label: 'Refrigeradores',
     description: 'No frost, side by side y bajo mesón.',
     cta: 'Preguntar disponibilidad',
+    image: '/products/refrigerador.webp',
   },
   {
     id: 'lavadora',
@@ -140,6 +141,7 @@ export const categorias = [
     label: 'Lavadoras',
     description: 'Carga frontal y superior, distintas capacidades.',
     cta: 'Preguntar disponibilidad',
+    image: '/products/lavadora.webp',
   },
   {
     id: 'secadora',
@@ -147,6 +149,7 @@ export const categorias = [
     label: 'Secadoras',
     description: 'Bomba de calor, ventilación y eléctricas.',
     cta: 'Preguntar disponibilidad',
+    image: '/products/secadora.webp',
   },
   {
     id: 'estufa',
@@ -154,6 +157,7 @@ export const categorias = [
     label: 'Estufas y cocinas',
     description: 'A gas, eléctricas e inducción con horno.',
     cta: 'Preguntar disponibilidad',
+    image: '/products/estufa.webp',
   },
   {
     id: 'freezer',
@@ -161,6 +165,7 @@ export const categorias = [
     label: 'Freezers',
     description: 'Verticales y horizontales, distintas capacidades.',
     cta: 'Preguntar disponibilidad',
+    image: '/products/freezer.webp',
   },
   {
     id: 'combo',
@@ -168,6 +173,7 @@ export const categorias = [
     label: 'Combos lavadora/secadora',
     description: 'Stack o all-in-one para espacios pequeños.',
     cta: 'Preguntar disponibilidad',
+    image: '/products/combo.webp',
   },
 ]
 

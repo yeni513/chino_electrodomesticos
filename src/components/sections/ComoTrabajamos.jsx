@@ -1,5 +1,6 @@
 import { MessageCircle, Camera, Truck, ClipboardCheck } from 'lucide-react'
 import Container from '../layout/Container.jsx'
+import Reveal from '../ui/Reveal.jsx'
 import { whatsappUrl } from '../../lib/whatsapp.js'
 
 const STEPS = [
@@ -29,7 +30,7 @@ export default function ComoTrabajamos() {
   return (
     <section id="como-trabajamos" className="section-y bg-white">
       <Container>
-        <div className="max-w-3xl">
+        <Reveal className="max-w-3xl">
           <p className="text-sm font-semibold uppercase tracking-wider text-brand-accent-dark">
             Cómo trabajamos
           </p>
@@ -39,13 +40,16 @@ export default function ComoTrabajamos() {
           <p className="mt-5 md:mt-6 text-lg md:text-xl text-slate-600 leading-relaxed">
             Comprar electrodomésticos no tiene por qué ser un papeleo. Esto es lo que pasa cuando nos escribes:
           </p>
-        </div>
+        </Reveal>
 
         <ol className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7 lg:gap-8">
           {STEPS.map((step, i) => {
             const Icon = step.icon
             return (
-              <li
+              <Reveal
+                as="li"
+                variant="up"
+                delay={(i % 4) * 90}
                 key={step.title}
                 className="relative p-7 md:p-8 rounded-card bg-brand-cream ring-1 ring-slate-200/60 hover:shadow-soft hover:-translate-y-0.5 transition-all duration-300 ease-smooth"
               >
@@ -61,7 +65,7 @@ export default function ComoTrabajamos() {
                 <p className="mt-2.5 text-sm md:text-base text-slate-600 leading-relaxed">
                   {step.body}
                 </p>
-              </li>
+              </Reveal>
             )
           })}
         </ol>

@@ -1,5 +1,6 @@
 import { MessageCircle, Phone, CheckCircle2, ArrowRight, Camera, Tag } from 'lucide-react'
 import Container from '../layout/Container.jsx'
+import Reveal from '../ui/Reveal.jsx'
 import { ctaFinal, business } from '../../data/content.js'
 import { whatsappUrl, telUrl, hasPhone } from '../../lib/whatsapp.js'
 
@@ -28,7 +29,7 @@ export default function CTAFinal() {
           />
 
           <div className="relative grid lg:grid-cols-12 gap-12 lg:gap-16 xl:gap-24 items-center">
-            <div className="lg:col-span-7">
+            <Reveal variant="right" className="lg:col-span-7">
               <p className="text-sm font-semibold uppercase tracking-wider text-brand-accent">
                 {ctaFinal.eyebrow}
               </p>
@@ -88,10 +89,10 @@ export default function CTAFinal() {
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 {ctaFinal.reassuranceUnderCta}
               </p>
-            </div>
+            </Reveal>
 
             {/* Simulación de chat */}
-            <div className="lg:col-span-5">
+            <Reveal variant="left" delay={120} className="lg:col-span-5">
               <div className="relative max-w-sm mx-auto lg:ml-auto lg:mr-0">
                 <div className="bg-white/[0.06] backdrop-blur-md rounded-card ring-1 ring-white/15 p-6 shadow-lift">
                   <div className="flex items-center gap-3 pb-4 border-b border-white/10">
@@ -132,7 +133,7 @@ export default function CTAFinal() {
                   </div>
                 </div>
               </div>
-            </div>
+            </Reveal>
           </div>
         </div>
       </Container>

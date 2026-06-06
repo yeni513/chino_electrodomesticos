@@ -1,21 +1,22 @@
 import { Plus } from 'lucide-react'
 import Container from '../layout/Container.jsx'
+import Reveal from '../ui/Reveal.jsx'
 import { faqs } from '../../data/content.js'
 
 export default function FAQ() {
   return (
     <section id="faq" className="section-y bg-brand-cream">
       <Container maxWidth="4xl">
-        <div className="text-center">
+        <Reveal className="text-center">
           <p className="text-sm font-semibold uppercase tracking-wider text-brand-accent-dark">
             Preguntas frecuentes
           </p>
           <h2 className="heading-section mt-3 font-display font-semibold text-brand-ink">
             Lo que la gente nos pregunta antes de comprar
           </h2>
-        </div>
+        </Reveal>
 
-        <div className="mt-14 divide-y divide-slate-200 rounded-card bg-white ring-1 ring-slate-200/60 overflow-hidden shadow-soft">
+        <Reveal variant="up" className="mt-14 divide-y divide-slate-200 rounded-card bg-white ring-1 ring-slate-200/60 overflow-hidden shadow-soft">
           {faqs.map((item, i) => (
             <details key={i} className="group">
               <summary className="flex items-center justify-between gap-6 px-7 md:px-9 py-6 md:py-7 cursor-pointer list-none hover:bg-slate-50 transition-colors">
@@ -31,7 +32,7 @@ export default function FAQ() {
               </div>
             </details>
           ))}
-        </div>
+        </Reveal>
       </Container>
     </section>
   )

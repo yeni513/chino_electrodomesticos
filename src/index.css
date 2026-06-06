@@ -95,6 +95,54 @@
   animation: menu-in 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ───────────────────────────────────────────────────────────────────────────
+   Scroll reveal — elementos con [data-reveal] entran al hacer scroll.
+   Lo gestiona el componente <Reveal> (IntersectionObserver) añadiendo
+   .is-visible. Solo se anima si el usuario no pidió movimiento reducido.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  [data-reveal]:not(.is-visible) {
+    will-change: opacity, transform;
+  }
+  [data-reveal='up']    { transform: translate3d(0, 32px, 0); }
+  [data-reveal='down']  { transform: translate3d(0, -28px, 0); }
+  [data-reveal='left']  { transform: translate3d(40px, 0, 0); }
+  [data-reveal='right'] { transform: translate3d(-40px, 0, 0); }
+  [data-reveal='scale'] { transform: scale(0.94); }
+  [data-reveal='fade']  { transform: none; }
+  [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Indicador de scroll del hero (chevron flotante). */
+@keyframes hero-bob {
+  0%, 100% { transform: translateY(0); opacity: 0.85; }
+  50%      { transform: translateY(6px); opacity: 1; }
+}
+.animate-hero-bob {
+  animation: hero-bob 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* Brillo dorado que recorre lentamente (acentos premium). */
+@keyframes sheen {
+  0%   { background-position: -150% 0; }
+  100% { background-position: 250% 0; }
+}
+
+/* Ken Burns muy sutil para imágenes de respaldo del hero (si no hay video). */
+@keyframes kenburns {
+  from { transform: scale(1); }
+  to   { transform: scale(1.08); }
+}
+
 /* Respeta preferencia del sistema de movimiento reducido. */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -1,4 +1,5 @@
 import Container from '../layout/Container.jsx'
+import Reveal from '../ui/Reveal.jsx'
 
 // Wordmarks tipográficos limpios — replican el estilo de la marca usando
 // font-family específica de cada brand sin descargar logos externos.
@@ -25,8 +26,11 @@ export default function Marcas() {
           aria-label="Marcas que trabajamos"
           className="mt-8 md:mt-10 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-x-6 gap-y-6 md:gap-y-8 items-center"
         >
-          {MARCAS.map((m) => (
-            <li
+          {MARCAS.map((m, i) => (
+            <Reveal
+              as="li"
+              variant="fade"
+              delay={(i % 8) * 60}
               key={m.name}
               className="group relative flex items-center justify-center h-10 md:h-12"
             >
@@ -35,7 +39,7 @@ export default function Marcas() {
               >
                 {m.name}
               </span>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </Container>
