@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Grid, ZoomIn, X, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react'
 import Container from '../layout/Container.jsx'
@@ -10,8 +10,6 @@ import { categorias } from '../../data/content.js'
 
 const CAT_LABEL = Object.fromEntries(categorias.map((c) => [c.id, c.label]))
 
-// Fotos curadas de respaldo (siempre válidas). Se combinan con las fotos reales
-// del inventario del admin (esas van primero cuando existen).
 const CURATED = [
   { src: '/products/refrigerador.webp', title: 'Refrigerador French Door', category: 'Refrigeradores' },
   { src: '/products/refrigerador-sxs.webp', title: 'Refrigerador Side by Side', category: 'Refrigeradores' },
@@ -30,13 +28,14 @@ const CURATED = [
   { src: '/products/combo-angle.webp', title: 'Combo — detalle', category: 'Combos' },
 ]
 
-const ROW_COUNT = 3
-const DURATIONS = ['62s', '48s', '70s'] // velocidades distintas por fila
+const SPEED = 0.5 // tarjetas por segundo
 
 export default function Galeria() {
   const { products } = useProducts()
   const [index, setIndex] = useState(null)
   const [broken, setBroken] = useState(() => new Set())
+  const cardRefs = useRef([])
+  const pausedRef = useRef(false)
 
   const images = useMemo(() => {
     const real = (products || []).flatMap((p) => {
@@ -55,12 +54,67 @@ export default function Galeria() {
     })
   }, [products, broken])
 
-  // Reparte las imágenes en filas (round-robin) para el muro diagonal.
-  const rows = useMemo(() => {
-    const r = Array.from({ length: ROW_COUNT }, () => [])
-    images.forEach((img, i) => r[i % ROW_COUNT].push(img))
-    // Si alguna fila quedó muy corta, la rellena repitiendo para que el loop luzca lleno.
-    return r.map((row) => (row.length >= 4 ? row : [...row, ...row, ...row].slice(0, Math.max(4, row.length))))
+  // Motor 3D: cada tarjeta recorre un riel diagonal en perspectiva hacia el frente.
+  useEffect(() => {
+    const N = images.length
+    if (N === 0) return
+    const isMobile = window.matchMedia('(max-width: 768px)').matches
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const C = isMobile
+      ? { VIS: 4, EXIT: 1.1, SX: 64, SY: 36, SZ: 170, STEP: 0.86, RY: 26 }
+      : { VIS: 6, EXIT: 1.3, SX: 104, SY: 56, SZ: 250, STEP: 0.9, RY: 30 }
+
+    const place = (p) => {
+      for (let i = 0; i < N; i++) {
+        const el = cardRefs.current[i]
+        if (!el) continue
+        const w = (((p - i) % N) + N) % N
+        const c = C.VIS - w // 0 = frente; positivo = se aleja al fondo; negativo = sale hacia cámara
+        let x, y, z, s, op
+        if (c >= 0) {
+          x = -C.SX * c
+          y = -C.SY * c
+          z = -C.SZ * c
+          s = Math.pow(C.STEP, c)
+          op = c > C.VIS - 1 ? Math.max(0, 1 - (c - (C.VIS - 1))) : 1
+        } else if (c > -C.EXIT) {
+          const e = -c
+          x = C.SX * e * 1.5
+          y = C.SY * e * 1.5
+          z = C.SZ * 0.7 * e
+          s = 1 + 0.22 * e
+          op = 1 - e / C.EXIT
+        } else {
+          op = 0
+          x = -C.SX * C.VIS
+          y = -C.SY * C.VIS
+          z = -C.SZ * C.VIS
+          s = 0.4
+        }
+        el.style.opacity = op
+        el.style.transform = `translate(-50%,-50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(0)}px) rotateY(${C.RY}deg) scale(${s.toFixed(3)})`
+        el.style.zIndex = String(Math.round(w * 10))
+        el.style.pointerEvents = op > 0.55 ? 'auto' : 'none'
+      }
+    }
+
+    if (reduce) {
+      place(2)
+      return
+    }
+
+    let p = 0
+    let last = performance.now()
+    let raf = 0
+    const loop = (now) => {
+      const dt = (now - last) / 1000
+      last = now
+      if (!pausedRef.current) p += dt * SPEED
+      place(p)
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
   }, [images])
 
   const open = index !== null && images[index]
@@ -89,7 +143,6 @@ export default function Galeria() {
 
   return (
     <section id="galeria" className="relative bg-brand-ink overflow-hidden py-16 md:py-24">
-      {/* Glow de fondo */}
       <div
         aria-hidden
         className="absolute inset-0 opacity-60"
@@ -99,7 +152,7 @@ export default function Galeria() {
         }}
       />
 
-      <Container className="relative z-20">
+      <Container className="relative z-30">
         <Reveal className="text-center max-w-3xl mx-auto">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 ring-1 ring-white/20 text-brand-accent text-xs font-semibold uppercase tracking-wider">
             <Grid className="w-3.5 h-3.5" />
@@ -109,55 +162,54 @@ export default function Galeria() {
             Mira los equipos de cerca
           </h2>
           <p className="mt-5 text-lg md:text-xl text-slate-300 leading-relaxed">
-            Fotos reales de lo que manejamos. Pasa el cursor para pausar, toca una para
-            verla en grande — y pídenos el modelo exacto por WhatsApp.
+            Pasa el cursor para pausar · toca una para verla en grande.
           </p>
         </Reveal>
       </Container>
 
-      {/* Muro diagonal en movimiento */}
-      <div className="relative mt-12 md:mt-16 h-[440px] md:h-[600px]">
-        <div className="marquee-track absolute left-1/2 top-1/2 w-[180%] -translate-x-1/2 -translate-y-1/2 rotate-[-8deg] flex flex-col gap-4 md:gap-6">
-          {rows.map((row, ri) => (
-            <div
-              key={ri}
-              className={`marquee-row ${ri % 2 === 1 ? 'reverse' : ''}`}
-              style={{ '--dur': DURATIONS[ri % DURATIONS.length] }}
+      {/* Escenario 3D */}
+      <div
+        className="relative mt-6 md:mt-10 h-[380px] md:h-[540px]"
+        style={{ perspective: '1700px' }}
+        onMouseEnter={() => (pausedRef.current = true)}
+        onMouseLeave={() => (pausedRef.current = false)}
+      >
+        <div
+          className="absolute left-1/2 top-1/2"
+          style={{ transformStyle: 'preserve-3d', transform: 'translate(40px, 30px)' }}
+        >
+          {images.map((img, i) => (
+            <button
+              key={img.src}
+              ref={(el) => (cardRefs.current[i] = el)}
+              type="button"
+              onClick={() => setIndex(i)}
+              aria-label={`Ampliar ${img.title}`}
+              className="group absolute left-1/2 top-1/2 w-[210px] h-[158px] md:w-[330px] md:h-[248px] rounded-2xl overflow-hidden bg-white ring-1 ring-white/10 shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+              style={{ willChange: 'transform, opacity', backfaceVisibility: 'hidden' }}
             >
-              {[...row, ...row].map((img, i) => (
-                <button
-                  key={`${ri}-${i}-${img.src}`}
-                  type="button"
-                  onClick={() => setIndex(images.indexOf(img))}
-                  aria-label={`Ampliar ${img.title}`}
-                  className="group relative shrink-0 mx-2 md:mx-3 w-[200px] h-[150px] md:w-[300px] md:h-[220px] rounded-2xl overflow-hidden bg-white ring-1 ring-white/10 shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
-                >
-                  <img
-                    src={img.src}
-                    alt={img.title}
-                    loading="lazy"
-                    decoding="async"
-                    draggable={false}
-                    onError={() => setBroken((prev) => new Set(prev).add(img.src))}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-brand-ink/55 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <ZoomIn className="w-7 h-7 text-white" />
-                    <span className="px-3 text-center text-xs font-semibold text-white leading-tight">
-                      {img.title}
-                    </span>
-                  </span>
-                </button>
-              ))}
-            </div>
+              <img
+                src={img.src}
+                alt={img.title}
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+                onError={() => setBroken((prev) => new Set(prev).add(img.src))}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-brand-ink/55 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <ZoomIn className="w-7 h-7 text-white" />
+                <span className="px-3 text-center text-xs font-semibold text-white leading-tight">
+                  {img.title}
+                </span>
+              </span>
+            </button>
           ))}
         </div>
 
-        {/* Degradados en los bordes para enmarcar el muro */}
-        <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-24 md:w-40 bg-gradient-to-r from-brand-ink to-transparent z-10" />
-        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-24 md:w-40 bg-gradient-to-l from-brand-ink to-transparent z-10" />
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-brand-ink to-transparent z-10" />
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-brand-ink to-transparent z-10" />
+        {/* Degradados de borde para enmarcar */}
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-20 md:w-36 bg-gradient-to-r from-brand-ink to-transparent z-20" />
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-20 md:w-36 bg-gradient-to-l from-brand-ink to-transparent z-20" />
       </div>
 
       {/* Lightbox */}
