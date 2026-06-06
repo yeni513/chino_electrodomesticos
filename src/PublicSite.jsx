@@ -78,10 +78,10 @@ export default function PublicSite() {
         <Suspense fallback={<GaleriaFallback />}>
           <Galeria />
         </Suspense>
-        <CatalogoBand />
         <ComoTrabajamos />
         <PorQueNosotros />
         <Location />
+        <CatalogoBand />
         <Testimonios />
         <FAQ />
         <CTAFinal />

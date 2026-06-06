@@ -10,30 +10,34 @@ import { categorias } from '../../data/content.js'
 
 const CAT_LABEL = Object.fromEntries(categorias.map((c) => [c.id, c.label]))
 
-// Fotos curadas de respaldo (siempre válidas). Se combinan con las fotos
-// reales del inventario del admin (esas van primero cuando existen).
+// Fotos curadas de respaldo (siempre válidas). Se combinan con las fotos reales
+// del inventario del admin (esas van primero cuando existen).
 const CURATED = [
   { src: '/products/refrigerador.webp', title: 'Refrigerador French Door', category: 'Refrigeradores' },
   { src: '/products/refrigerador-sxs.webp', title: 'Refrigerador Side by Side', category: 'Refrigeradores' },
   { src: '/products/refrigerador-angle.webp', title: 'Refrigerador — interior', category: 'Refrigeradores' },
   { src: '/products/lavadora.webp', title: 'Lavadora carga frontal', category: 'Lavadoras' },
   { src: '/products/lavadora-top.webp', title: 'Lavadora carga superior', category: 'Lavadoras' },
+  { src: '/products/lavadora-angle.webp', title: 'Lavadora — detalle', category: 'Lavadoras' },
   { src: '/products/secadora.webp', title: 'Secadora', category: 'Secadoras' },
   { src: '/products/secadora-angle.webp', title: 'Secadora — detalle', category: 'Secadoras' },
   { src: '/products/estufa.webp', title: 'Estufa a gas', category: 'Estufas' },
   { src: '/products/estufa-electrica.webp', title: 'Estufa eléctrica', category: 'Estufas' },
+  { src: '/products/estufa-angle.webp', title: 'Estufa — detalle', category: 'Estufas' },
   { src: '/products/freezer.webp', title: 'Freezer vertical', category: 'Freezers' },
+  { src: '/products/freezer-angle.webp', title: 'Freezer — interior', category: 'Freezers' },
   { src: '/products/combo.webp', title: 'Combo apilable', category: 'Combos' },
   { src: '/products/combo-angle.webp', title: 'Combo — detalle', category: 'Combos' },
 ]
 
+const ROW_COUNT = 3
+const DURATIONS = ['62s', '48s', '70s'] // velocidades distintas por fila
+
 export default function Galeria() {
   const { products } = useProducts()
-  const [filter, setFilter] = useState('Todos')
   const [index, setIndex] = useState(null)
   const [broken, setBroken] = useState(() => new Set())
 
-  // Fotos reales del admin (con imagen) + curadas de respaldo, sin las rotas.
   const images = useMemo(() => {
     const real = (products || []).flatMap((p) => {
       const gallery = p.images?.length ? p.images : p.image ? [p.image] : []
@@ -51,17 +55,19 @@ export default function Galeria() {
     })
   }, [products, broken])
 
-  const categories = useMemo(
-    () => ['Todos', ...Array.from(new Set(images.map((i) => i.category)))],
-    [images],
-  )
-  const filtered = filter === 'Todos' ? images : images.filter((i) => i.category === filter)
+  // Reparte las imágenes en filas (round-robin) para el muro diagonal.
+  const rows = useMemo(() => {
+    const r = Array.from({ length: ROW_COUNT }, () => [])
+    images.forEach((img, i) => r[i % ROW_COUNT].push(img))
+    // Si alguna fila quedó muy corta, la rellena repitiendo para que el loop luzca lleno.
+    return r.map((row) => (row.length >= 4 ? row : [...row, ...row, ...row].slice(0, Math.max(4, row.length))))
+  }, [images])
 
-  const open = index !== null && filtered[index]
-  const current = open ? filtered[index] : null
+  const open = index !== null && images[index]
+  const current = open ? images[index] : null
   const close = () => setIndex(null)
-  const next = () => setIndex((i) => (i + 1) % filtered.length)
-  const prev = () => setIndex((i) => (i - 1 + filtered.length) % filtered.length)
+  const next = () => setIndex((i) => (i + 1) % images.length)
+  const prev = () => setIndex((i) => (i - 1 + images.length) % images.length)
 
   useEffect(() => {
     if (!open) return
@@ -77,77 +83,82 @@ export default function Galeria() {
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = prevOverflow
     }
-  }, [open, filtered.length])
+  }, [open, images.length])
+
+  if (images.length === 0) return null
 
   return (
-    <section id="galeria" className="section-y bg-white">
-      <Container>
+    <section id="galeria" className="relative bg-brand-ink overflow-hidden py-16 md:py-24">
+      {/* Glow de fondo */}
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-60"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 15% 10%, rgba(201,162,39,0.18), transparent 45%), radial-gradient(circle at 85% 90%, rgba(43,81,132,0.5), transparent 55%)',
+        }}
+      />
+
+      <Container className="relative z-20">
         <Reveal className="text-center max-w-3xl mx-auto">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-accent/15 text-brand-accent-dark text-xs font-semibold uppercase tracking-wider">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 ring-1 ring-white/20 text-brand-accent text-xs font-semibold uppercase tracking-wider">
             <Grid className="w-3.5 h-3.5" />
             Galería
           </span>
-          <h2 className="heading-section mt-4 font-display font-semibold text-brand-ink">
+          <h2 className="heading-section mt-4 font-display font-semibold text-white">
             Mira los equipos de cerca
           </h2>
-          <p className="mt-5 text-lg md:text-xl text-slate-600 leading-relaxed">
-            Fotos reales de los electrodomésticos que manejamos. Toca cualquiera para verla
-            en grande — y pídenos la del modelo exacto por WhatsApp.
+          <p className="mt-5 text-lg md:text-xl text-slate-300 leading-relaxed">
+            Fotos reales de lo que manejamos. Pasa el cursor para pausar, toca una para
+            verla en grande — y pídenos el modelo exacto por WhatsApp.
           </p>
         </Reveal>
-
-        {/* Filtros */}
-        <div className="mt-10 flex flex-wrap justify-center gap-2">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => {
-                setFilter(cat)
-                setIndex(null)
-              }}
-              aria-pressed={filter === cat}
-              className={[
-                'inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent',
-                filter === cat
-                  ? 'bg-brand-ink text-white ring-1 ring-brand-ink'
-                  : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:ring-brand-ink',
-              ].join(' ')}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Grid */}
-        <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-          {filtered.map((img, i) => (
-            <Reveal
-              as="button"
-              type="button"
-              key={img.src}
-              variant="scale"
-              delay={(i % 4) * 60}
-              onClick={() => setIndex(i)}
-              aria-label={`Ampliar ${img.title}`}
-              className="group relative aspect-square overflow-hidden rounded-card bg-gradient-to-b from-slate-50 to-brand-cream ring-1 ring-slate-200 hover:ring-brand-ink hover:shadow-lift transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
-            >
-              <img
-                src={img.src}
-                alt={img.title}
-                loading="lazy"
-                decoding="async"
-                onError={() => setBroken((prev) => new Set(prev).add(img.src))}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-brand-ink/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <ZoomIn className="w-7 h-7 text-white" />
-                <span className="px-3 text-center text-sm font-semibold text-white">{img.title}</span>
-              </span>
-            </Reveal>
-          ))}
-        </div>
       </Container>
+
+      {/* Muro diagonal en movimiento */}
+      <div className="relative mt-12 md:mt-16 h-[440px] md:h-[600px]">
+        <div className="marquee-track absolute left-1/2 top-1/2 w-[180%] -translate-x-1/2 -translate-y-1/2 rotate-[-8deg] flex flex-col gap-4 md:gap-6">
+          {rows.map((row, ri) => (
+            <div
+              key={ri}
+              className={`marquee-row ${ri % 2 === 1 ? 'reverse' : ''}`}
+              style={{ '--dur': DURATIONS[ri % DURATIONS.length] }}
+            >
+              {[...row, ...row].map((img, i) => (
+                <button
+                  key={`${ri}-${i}-${img.src}`}
+                  type="button"
+                  onClick={() => setIndex(images.indexOf(img))}
+                  aria-label={`Ampliar ${img.title}`}
+                  className="group relative shrink-0 mx-2 md:mx-3 w-[200px] h-[150px] md:w-[300px] md:h-[220px] rounded-2xl overflow-hidden bg-white ring-1 ring-white/10 shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+                >
+                  <img
+                    src={img.src}
+                    alt={img.title}
+                    loading="lazy"
+                    decoding="async"
+                    draggable={false}
+                    onError={() => setBroken((prev) => new Set(prev).add(img.src))}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-brand-ink/55 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <ZoomIn className="w-7 h-7 text-white" />
+                    <span className="px-3 text-center text-xs font-semibold text-white leading-tight">
+                      {img.title}
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* Degradados en los bordes para enmarcar el muro */}
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-24 md:w-40 bg-gradient-to-r from-brand-ink to-transparent z-10" />
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-24 md:w-40 bg-gradient-to-l from-brand-ink to-transparent z-10" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-brand-ink to-transparent z-10" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-brand-ink to-transparent z-10" />
+      </div>
 
       {/* Lightbox */}
       {open &&
@@ -167,7 +178,7 @@ export default function Galeria() {
             >
               <X className="w-6 h-6" />
             </button>
-            {filtered.length > 1 && (
+            {images.length > 1 && (
               <>
                 <button
                   type="button"
