@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react'
 import {
   Package,
   ArrowRight,
@@ -7,15 +8,19 @@ import {
   Truck,
   Clock3,
   XCircle,
+  Eye,
 } from 'lucide-react'
 import Container from '../layout/Container.jsx'
 import Button from '../ui/Button.jsx'
 import Reveal from '../ui/Reveal.jsx'
-import { destacadosIntro, destacadosEmptyState } from '../../data/content.js'
+import ProductModal from './ProductModal.jsx'
+import { destacadosIntro, destacadosEmptyState, categorias } from '../../data/content.js'
 import { whatsappUrl } from '../../lib/whatsapp.js'
 import { useProducts } from '../../supabase/useProducts.js'
 import { CATEGORY_ICON } from '../../lib/icons.js'
 import { srcAt, srcSetFor } from '../../lib/imgUrl.js'
+
+const CATEGORY_LABEL = Object.fromEntries(categorias.map((c) => [c.id, c.label]))
 
 const CHIP_ICONS = { CheckCircle2, PackageCheck, Truck, Clock3, XCircle }
 
@@ -42,6 +47,30 @@ const EMPTY_STATE_PRODUCTS = [
 export default function Destacados() {
   const { products: cmsProducts, loading } = useProducts()
   const isEmpty = !loading && (!cmsProducts || cmsProducts.length === 0)
+
+  const [filter, setFilter] = useState('all')
+  const [quickView, setQuickView] = useState(null)
+
+  // Las fichas de categoría pueden pedir filtrar el catálogo por categoría.
+  useEffect(() => {
+    const onFilter = (e) => setFilter(e.detail || 'all')
+    window.addEventListener('catalog:filter', onFilter)
+    return () => window.removeEventListener('catalog:filter', onFilter)
+  }, [])
+
+  // Categorías presentes en el inventario real (para mostrar solo filtros útiles).
+  const presentCategories = useMemo(() => {
+    const set = new Set((cmsProducts || []).map((p) => p.category).filter(Boolean))
+    return categorias.map((c) => c.id).filter((id) => set.has(id))
+  }, [cmsProducts])
+
+  const filtered = useMemo(() => {
+    const list = cmsProducts || []
+    if (filter === 'all') return list
+    return list.filter((p) => p.category === filter)
+  }, [cmsProducts, filter])
+
+  const showFilters = !isEmpty && presentCategories.length > 1
 
   return (
     <section id="destacados" className="section-y bg-brand-cream/60">
@@ -77,13 +106,47 @@ export default function Destacados() {
           <EmptyState />
         ) : (
           <>
-            <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7 lg:gap-8">
-              {(cmsProducts || []).slice(0, 8).map((p, i) => (
-                <Reveal key={p.id} variant="up" delay={(i % 4) * 80}>
-                  <ProductCard product={p} />
-                </Reveal>
-              ))}
-            </div>
+            {/* Filtros por categoría */}
+            {showFilters && (
+              <div className="mt-10 flex flex-wrap gap-2">
+                <FilterChip
+                  active={filter === 'all'}
+                  onClick={() => setFilter('all')}
+                  label={`Todos (${(cmsProducts || []).length})`}
+                />
+                {presentCategories.map((id) => (
+                  <FilterChip
+                    key={id}
+                    active={filter === id}
+                    onClick={() => setFilter(id)}
+                    label={CATEGORY_LABEL[id] || id}
+                  />
+                ))}
+              </div>
+            )}
+
+            {filtered.length === 0 ? (
+              <div className="mt-12 rounded-card bg-white ring-1 ring-slate-200/70 p-8 text-center">
+                <p className="text-slate-600">
+                  No hay equipos en esta categoría ahora mismo.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setFilter('all')}
+                  className="mt-3 text-sm font-semibold text-brand-accent-dark hover:underline"
+                >
+                  Ver todo el catálogo
+                </button>
+              </div>
+            ) : (
+              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7 lg:gap-8">
+                {filtered.slice(0, 12).map((p, i) => (
+                  <Reveal key={p.id} variant="up" delay={(i % 4) * 80}>
+                    <ProductCard product={p} onQuickView={() => setQuickView(p)} />
+                  </Reveal>
+                ))}
+              </div>
+            )}
 
             <p className="mt-12 text-xs md:text-sm text-slate-500 text-center md:text-left">
               Stock y precios sujetos a disponibilidad. Confirma por WhatsApp antes de venir.
@@ -91,7 +154,31 @@ export default function Destacados() {
           </>
         )}
       </Container>
+
+      <ProductModal
+        product={quickView}
+        open={quickView !== null}
+        onClose={() => setQuickView(null)}
+      />
     </section>
+  )
+}
+
+function FilterChip({ active, onClick, label }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={[
+        'inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent',
+        active
+          ? 'bg-brand-ink text-white ring-1 ring-brand-ink'
+          : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:ring-brand-ink',
+      ].join(' ')}
+    >
+      {label}
+    </button>
   )
 }
 
@@ -144,7 +231,7 @@ function EmptyState() {
   )
 }
 
-function ProductCard({ product: p }) {
+function ProductCard({ product: p, onQuickView }) {
   const Icon = CATEGORY_ICON[p.category] || Package
   const productMessage = `Hola, quiero consultar por ${p.name}`
   const badge = p.badge
@@ -153,8 +240,13 @@ function ProductCard({ product: p }) {
 
   return (
     <article className="group flex flex-col rounded-card bg-white ring-1 ring-slate-200 hover:ring-slate-300 hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-smooth overflow-hidden">
-      {/* Visual */}
-      <div className="relative aspect-[4/3] bg-gradient-to-br from-slate-100 via-white to-brand-cream overflow-hidden">
+      {/* Visual — abre la vista rápida del producto */}
+      <button
+        type="button"
+        onClick={onQuickView}
+        aria-label={`Ver detalles de ${p.name}`}
+        className="relative aspect-[4/3] w-full bg-gradient-to-br from-slate-100 via-white to-brand-cream overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+      >
         {p.image ? (
           <img
             src={srcAt(p.image, { width: 640 })}
@@ -173,19 +265,23 @@ function ProductCard({ product: p }) {
         )}
 
         {badge?.label && (
-          <div className="absolute top-4 left-4">
-            <span
-              className={[
-                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full',
-                'text-xs font-semibold ring-1 ring-inset',
-                BADGE_TONES[badge.tone] || BADGE_TONES.ink,
-              ].join(' ')}
-            >
-              {badge.label}
-            </span>
-          </div>
+          <span
+            className={[
+              'absolute top-4 left-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full',
+              'text-xs font-semibold ring-1 ring-inset',
+              BADGE_TONES[badge.tone] || BADGE_TONES.ink,
+            ].join(' ')}
+          >
+            {badge.label}
+          </span>
         )}
-      </div>
+
+        {/* Pista de interacción */}
+        <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-ink/85 backdrop-blur-sm text-white text-xs font-semibold opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+          <Eye className="w-3.5 h-3.5" />
+          Ver detalles
+        </span>
+      </button>
 
       {/* Ficha */}
       <div className="flex flex-col flex-1 p-6 md:p-7">
