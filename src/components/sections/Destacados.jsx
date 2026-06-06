@@ -14,7 +14,7 @@ import Container from '../layout/Container.jsx'
 import Button from '../ui/Button.jsx'
 import Reveal from '../ui/Reveal.jsx'
 import ProductModal from './ProductModal.jsx'
-import { destacadosIntro, destacadosEmptyState, categorias } from '../../data/content.js'
+import { destacadosIntro, demoProducts, categorias } from '../../data/content.js'
 import { whatsappUrl } from '../../lib/whatsapp.js'
 import { useProducts } from '../../supabase/useProducts.js'
 import { CATEGORY_ICON } from '../../lib/icons.js'
@@ -36,17 +36,16 @@ const BADGE_TONES = {
   soldout: 'bg-amber-500 text-brand-ink ring-amber-500',
 }
 
-// Imágenes reales para el empty state (mientras el inventario está vacío).
-const EMPTY_STATE_PRODUCTS = [
-  { src: '/products/refrigerador.webp', alt: 'Refrigerador disponible en Trusted Appliances' },
-  { src: '/products/lavadora.webp', alt: 'Lavadora disponible en Trusted Appliances' },
-  { src: '/products/estufa.webp', alt: 'Estufa disponible en Trusted Appliances' },
-  { src: '/products/secadora.webp', alt: 'Secadora disponible en Trusted Appliances' },
-]
-
 export default function Destacados() {
   const { products: cmsProducts, loading } = useProducts()
-  const isEmpty = !loading && (!cmsProducts || cmsProducts.length === 0)
+  const realProducts = cmsProducts || []
+
+  // Mientras haya poco inventario real cargado, completamos con el catálogo de
+  // ejemplo para que la tienda se vea llena (los reales van primero). En cuanto
+  // el admin tenga 6+ productos reales, el demo desaparece automáticamente.
+  const fillWithDemo = realProducts.length < 6
+  const usingDemo = fillWithDemo
+  const products = fillWithDemo ? [...realProducts, ...demoProducts] : realProducts
 
   const [filter, setFilter] = useState('all')
   const [quickView, setQuickView] = useState(null)
@@ -58,19 +57,18 @@ export default function Destacados() {
     return () => window.removeEventListener('catalog:filter', onFilter)
   }, [])
 
-  // Categorías presentes en el inventario real (para mostrar solo filtros útiles).
+  // Categorías presentes en el catálogo (para mostrar solo filtros útiles).
   const presentCategories = useMemo(() => {
-    const set = new Set((cmsProducts || []).map((p) => p.category).filter(Boolean))
+    const set = new Set(products.map((p) => p.category).filter(Boolean))
     return categorias.map((c) => c.id).filter((id) => set.has(id))
-  }, [cmsProducts])
+  }, [products])
 
   const filtered = useMemo(() => {
-    const list = cmsProducts || []
-    if (filter === 'all') return list
-    return list.filter((p) => p.category === filter)
-  }, [cmsProducts, filter])
+    if (filter === 'all') return products
+    return products.filter((p) => p.category === filter)
+  }, [products, filter])
 
-  const showFilters = !isEmpty && presentCategories.length > 1
+  const showFilters = presentCategories.length > 1
 
   return (
     <section id="destacados" className="section-y bg-brand-cream/60">
@@ -87,72 +85,64 @@ export default function Destacados() {
               {destacadosIntro.subhead}
             </p>
           </Reveal>
-          {!isEmpty && (
-            <Button
-              as="a"
-              href={whatsappUrl('Hola, busco un modelo que no veo en la web. ¿Pueden ayudarme?')}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="ghost"
-              size="md"
-            >
-              Preguntar disponibilidad
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          )}
+          <Button
+            as="a"
+            href={whatsappUrl('Hola, busco un modelo que no veo en la web. ¿Pueden ayudarme?')}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="ghost"
+            size="md"
+          >
+            Preguntar disponibilidad
+            <ArrowRight className="w-4 h-4" />
+          </Button>
         </div>
 
-        {isEmpty ? (
-          <EmptyState />
-        ) : (
-          <>
-            {/* Filtros por categoría */}
-            {showFilters && (
-              <div className="mt-10 flex flex-wrap gap-2">
-                <FilterChip
-                  active={filter === 'all'}
-                  onClick={() => setFilter('all')}
-                  label={`Todos (${(cmsProducts || []).length})`}
-                />
-                {presentCategories.map((id) => (
-                  <FilterChip
-                    key={id}
-                    active={filter === id}
-                    onClick={() => setFilter(id)}
-                    label={CATEGORY_LABEL[id] || id}
-                  />
-                ))}
-              </div>
-            )}
-
-            {filtered.length === 0 ? (
-              <div className="mt-12 rounded-card bg-white ring-1 ring-slate-200/70 p-8 text-center">
-                <p className="text-slate-600">
-                  No hay equipos en esta categoría ahora mismo.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setFilter('all')}
-                  className="mt-3 text-sm font-semibold text-brand-accent-dark hover:underline"
-                >
-                  Ver todo el catálogo
-                </button>
-              </div>
-            ) : (
-              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7 lg:gap-8">
-                {filtered.slice(0, 12).map((p, i) => (
-                  <Reveal key={p.id} variant="up" delay={(i % 4) * 80}>
-                    <ProductCard product={p} onQuickView={() => setQuickView(p)} />
-                  </Reveal>
-                ))}
-              </div>
-            )}
-
-            <p className="mt-12 text-xs md:text-sm text-slate-500 text-center md:text-left">
-              Stock y precios sujetos a disponibilidad. Confirma por WhatsApp antes de venir.
-            </p>
-          </>
+        {/* Filtros por categoría */}
+        {showFilters && (
+          <div className="mt-10 flex flex-wrap gap-2">
+            <FilterChip
+              active={filter === 'all'}
+              onClick={() => setFilter('all')}
+              label={`Todos (${products.length})`}
+            />
+            {presentCategories.map((id) => (
+              <FilterChip
+                key={id}
+                active={filter === id}
+                onClick={() => setFilter(id)}
+                label={CATEGORY_LABEL[id] || id}
+              />
+            ))}
+          </div>
         )}
+
+        {filtered.length === 0 ? (
+          <div className="mt-12 rounded-card bg-white ring-1 ring-slate-200/70 p-8 text-center">
+            <p className="text-slate-600">No hay equipos en esta categoría ahora mismo.</p>
+            <button
+              type="button"
+              onClick={() => setFilter('all')}
+              className="mt-3 text-sm font-semibold text-brand-accent-dark hover:underline"
+            >
+              Ver todo el catálogo
+            </button>
+          </div>
+        ) : (
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7 lg:gap-8">
+            {filtered.slice(0, 12).map((p, i) => (
+              <Reveal key={p.id} variant="up" delay={(i % 4) * 80}>
+                <ProductCard product={p} onQuickView={() => setQuickView(p)} />
+              </Reveal>
+            ))}
+          </div>
+        )}
+
+        <p className="mt-12 text-xs md:text-sm text-slate-500 text-center md:text-left">
+          {usingDemo
+            ? 'Catálogo de muestra — el inventario real se actualiza según disponibilidad. Escríbenos por WhatsApp para confirmar.'
+            : 'Stock y precios sujetos a disponibilidad. Confirma por WhatsApp antes de venir.'}
+        </p>
       </Container>
 
       <ProductModal
@@ -237,6 +227,8 @@ function ProductCard({ product: p, onQuickView }) {
   const badge = p.badge
   const isSold = p.status === 'vendido'
   const isOut = p.status === 'agotado'
+  const [imgError, setImgError] = useState(false)
+  const showImg = p.image && !imgError
 
   return (
     <article className="group flex flex-col rounded-card bg-white ring-1 ring-slate-200 hover:ring-slate-300 hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-smooth overflow-hidden">
@@ -247,7 +239,7 @@ function ProductCard({ product: p, onQuickView }) {
         aria-label={`Ver detalles de ${p.name}`}
         className="relative aspect-[4/3] w-full bg-gradient-to-br from-slate-100 via-white to-brand-cream overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
       >
-        {p.image ? (
+        {showImg ? (
           <img
             src={srcAt(p.image, { width: 640 })}
             srcSet={srcSetFor(p.image)}
@@ -255,6 +247,7 @@ function ProductCard({ product: p, onQuickView }) {
             alt={`${p.name} disponible en Trusted Appliances Cleveland`}
             loading="lazy"
             decoding="async"
+            onError={() => setImgError(true)}
             className={[
               'absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-smooth group-hover:scale-105',
               isSold || isOut ? 'opacity-60 grayscale' : '',

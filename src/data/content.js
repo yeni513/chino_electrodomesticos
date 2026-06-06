@@ -66,14 +66,25 @@ export const business = {
   region: 'OH',
   country: 'US',
   serviceArea: 'Cleveland y área metropolitana, OH',
-  address: 'Atención por WhatsApp · visitas con cita previa',
-  hours: 'Lun–Sáb · Respuesta por WhatsApp en horario de tienda',
+  // Tienda física
+  street: '9640 Lorain Ave',
+  zip: '44102',
+  address: '9640 Lorain Ave, Cleveland, OH 44102',
+  hours: 'Lun–Sáb · Escríbenos para confirmar el horario de hoy',
+  // Google Maps (sin API key): búsqueda, cómo llegar y embed para iframe
+  mapsUrl:
+    'https://www.google.com/maps/search/?api=1&query=9640+Lorain+Ave+Cleveland+OH+44102',
+  mapsDirUrl:
+    'https://www.google.com/maps/dir/?api=1&destination=9640+Lorain+Ave+Cleveland+OH+44102',
+  mapEmbedUrl:
+    'https://www.google.com/maps?q=9640+Lorain+Ave,+Cleveland,+OH+44102&output=embed',
 }
 
 export const nav = [
   { label: 'Catálogo', href: '#categorias' },
   { label: 'Destacados', href: '#destacados' },
   { label: 'Por qué nosotros', href: '#por-que' },
+  { label: 'Tienda', href: '#visitanos' },
   { label: 'Preguntas', href: '#faq' },
 ]
 
@@ -250,6 +261,136 @@ export const destacadosEmptyState = {
   ctaMessage:
     'Hola, ¿qué tienen disponible esta semana? Busco principalmente: ___',
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Catálogo de ejemplo (demo)
+//  Se muestra en la sección Destacados SOLO cuando aún no hay productos reales
+//  cargados en el admin (Supabase). En cuanto el cliente carga su inventario
+//  real desde /admin/dashboard, estos productos de ejemplo desaparecen y se
+//  muestran los reales. Precios y modelos son representativos y editables.
+// ─────────────────────────────────────────────────────────────────────────────
+const demoChips = (condition) => [
+  { icon: 'CheckCircle2', label: 'Disponible', tone: 'success' },
+  { icon: 'PackageCheck', label: condition, tone: 'neutral' },
+  { icon: 'Truck', label: 'Entrega disponible', tone: 'neutral' },
+]
+
+export const demoProducts = [
+  {
+    id: 'demo-ref-1',
+    name: 'Refrigerador French Door',
+    category: 'refrigerador',
+    spec: 'Acero inoxidable · No frost',
+    detail: 'Doble puerta con cajón freezer inferior. Amplia capacidad para la familia.',
+    price: '$690',
+    status: 'disponible',
+    badge: { label: 'Destacado', tone: 'ink' },
+    featured: true,
+    images: ['/products/refrigerador.webp', '/products/refrigerador-angle.webp'],
+    chips: demoChips('Seminuevo'),
+  },
+  {
+    id: 'demo-ref-2',
+    name: 'Refrigerador Side by Side',
+    category: 'refrigerador',
+    spec: 'Acero inoxidable · Dispensador',
+    detail: 'Dos puertas verticales con dispensador de hielo y agua.',
+    price: '$890',
+    status: 'disponible',
+    badge: { label: 'Refrigerador', tone: 'ink' },
+    images: ['/products/refrigerador-sxs.webp'],
+    chips: demoChips('Como nuevo'),
+  },
+  {
+    id: 'demo-lav-1',
+    name: 'Lavadora carga frontal',
+    category: 'lavadora',
+    spec: 'Blanco · 18 lb',
+    detail: 'Carga frontal de alta eficiencia, varios ciclos de lavado.',
+    price: '$430',
+    status: 'disponible',
+    badge: { label: 'Lavadora', tone: 'ink' },
+    images: ['/products/lavadora.webp', '/products/lavadora-angle.webp'],
+    chips: demoChips('Seminuevo'),
+  },
+  {
+    id: 'demo-lav-2',
+    name: 'Lavadora carga superior',
+    category: 'lavadora',
+    spec: 'Blanco · 20 lb',
+    detail: 'Carga superior amplia, fácil de usar y muy resistente.',
+    price: '$380',
+    status: 'disponible',
+    badge: { label: 'Lavadora', tone: 'ink' },
+    images: ['/products/lavadora-top.webp'],
+    chips: demoChips('Usado revisado'),
+  },
+  {
+    id: 'demo-sec-1',
+    name: 'Secadora eléctrica',
+    category: 'secadora',
+    spec: 'Acero inoxidable · Eléctrica',
+    detail: 'Secado por calor con varios niveles y sensor de humedad.',
+    price: '$360',
+    status: 'disponible',
+    badge: { label: 'Secadora', tone: 'ink' },
+    images: ['/products/secadora.webp', '/products/secadora-angle.webp'],
+    chips: demoChips('Seminuevo'),
+  },
+  {
+    id: 'demo-est-1',
+    name: 'Estufa a gas 5 quemadores',
+    category: 'estufa',
+    spec: 'Acero inoxidable · Gas',
+    detail: 'Cocina a gas con horno y cinco quemadores de distinta potencia.',
+    price: '$540',
+    status: 'disponible',
+    badge: { label: 'Destacado', tone: 'ink' },
+    featured: true,
+    images: ['/products/estufa.webp', '/products/estufa-angle.webp'],
+    chips: demoChips('Como nuevo'),
+  },
+  {
+    id: 'demo-est-2',
+    name: 'Estufa eléctrica con horno',
+    category: 'estufa',
+    spec: 'Blanco · Eléctrica',
+    detail: 'Tope de vitrocerámica y horno eléctrico de gran capacidad.',
+    price: '$480',
+    status: 'disponible',
+    badge: { label: 'Estufa', tone: 'ink' },
+    images: ['/products/estufa-electrica.webp'],
+    chips: demoChips('Seminuevo'),
+  },
+  {
+    id: 'demo-fre-1',
+    name: 'Freezer vertical',
+    category: 'freezer',
+    spec: 'Blanco · Vertical',
+    detail: 'Congelador vertical con estantes, ideal para almacenar más.',
+    price: '$410',
+    status: 'disponible',
+    badge: { label: 'Freezer', tone: 'ink' },
+    images: ['/products/freezer.webp', '/products/freezer-angle.webp'],
+    chips: demoChips('Usado revisado'),
+  },
+  {
+    id: 'demo-com-1',
+    name: 'Combo torre apilable',
+    category: 'combo',
+    spec: 'Acero inoxidable · Stack',
+    detail: 'Lavadora y secadora apilables, perfectas para espacios pequeños.',
+    price: '$820',
+    status: 'disponible',
+    badge: { label: 'Combo', tone: 'ink' },
+    images: ['/products/combo.webp', '/products/combo-angle.webp'],
+    chips: demoChips('Como nuevo'),
+  },
+].map((p) => ({
+  ...p,
+  image: p.images[0],
+  deliveryAvailable: true,
+}))
 
 export const marcas = [
   'Whirlpool',

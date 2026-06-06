@@ -7,6 +7,8 @@ import Categorias from './components/sections/Categorias.jsx'
 import PorQueNosotros from './components/sections/PorQueNosotros.jsx'
 import ComoTrabajamos from './components/sections/ComoTrabajamos.jsx'
 import Marcas from './components/sections/Marcas.jsx'
+import Showcase from './components/sections/Showcase.jsx'
+import Location from './components/sections/Location.jsx'
 import Testimonios from './components/sections/Testimonios.jsx'
 import FAQ from './components/sections/FAQ.jsx'
 import CTAFinal from './components/sections/CTAFinal.jsx'
@@ -54,8 +56,10 @@ export default function PublicSite() {
         <Suspense fallback={<DestacadosFallback />}>
           <Destacados />
         </Suspense>
+        <Showcase />
         <ComoTrabajamos />
         <PorQueNosotros />
+        <Location />
         <Testimonios />
         <FAQ />
         <CTAFinal />
