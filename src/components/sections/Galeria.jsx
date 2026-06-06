@@ -61,8 +61,8 @@ export default function Galeria() {
     const isMobile = window.matchMedia('(max-width: 768px)').matches
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const C = isMobile
-      ? { VIS: 4, EXIT: 1.1, SX: 64, SY: 36, SZ: 170, STEP: 0.86, RY: 26 }
-      : { VIS: 6, EXIT: 1.3, SX: 104, SY: 56, SZ: 250, STEP: 0.9, RY: 30 }
+      ? { VIS: 4, EXIT: 1.1, SX: 78, SY: 44, SZ: 190, STEP: 0.87, RY: 26 }
+      : { VIS: 6, EXIT: 1.3, SX: 130, SY: 70, SZ: 290, STEP: 0.9, RY: 30 }
 
     const place = (p) => {
       for (let i = 0; i < N; i++) {
@@ -169,8 +169,8 @@ export default function Galeria() {
 
       {/* Escenario 3D */}
       <div
-        className="relative mt-6 md:mt-10 h-[380px] md:h-[540px]"
-        style={{ perspective: '1700px' }}
+        className="relative mt-6 md:mt-10 h-[440px] md:h-[660px]"
+        style={{ perspective: '1900px' }}
         onMouseEnter={() => (pausedRef.current = true)}
         onMouseLeave={() => (pausedRef.current = false)}
       >
@@ -185,7 +185,7 @@ export default function Galeria() {
               type="button"
               onClick={() => setIndex(i)}
               aria-label={`Ampliar ${img.title}`}
-              className="group absolute left-1/2 top-1/2 w-[210px] h-[158px] md:w-[330px] md:h-[248px] rounded-2xl overflow-hidden bg-white ring-1 ring-white/10 shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+              className="group absolute left-1/2 top-1/2 w-[280px] h-[210px] md:w-[460px] md:h-[345px] rounded-2xl overflow-hidden bg-white ring-1 ring-white/10 shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
               style={{ willChange: 'transform, opacity', backfaceVisibility: 'hidden' }}
             >
               <img
