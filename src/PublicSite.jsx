@@ -8,6 +8,8 @@ import PorQueNosotros from './components/sections/PorQueNosotros.jsx'
 import ComoTrabajamos from './components/sections/ComoTrabajamos.jsx'
 import Marcas from './components/sections/Marcas.jsx'
 import Showcase from './components/sections/Showcase.jsx'
+import Galeria from './components/sections/Galeria.jsx'
+import CatalogoBand from './components/sections/CatalogoBand.jsx'
 import Location from './components/sections/Location.jsx'
 import Testimonios from './components/sections/Testimonios.jsx'
 import FAQ from './components/sections/FAQ.jsx'
@@ -57,6 +59,8 @@ export default function PublicSite() {
           <Destacados />
         </Suspense>
         <Showcase />
+        <Galeria />
+        <CatalogoBand />
         <ComoTrabajamos />
         <PorQueNosotros />
         <Location />

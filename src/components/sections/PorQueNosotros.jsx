@@ -36,22 +36,19 @@ export default function PorQueNosotros() {
           {porQue.map((item, i) => {
             const Icon = ICONS[item.icon]
             return (
-              <Reveal
-                key={item.title}
-                variant="up"
-                delay={(i % 4) * 90}
-                className="relative p-7 md:p-8 lg:p-9 rounded-card bg-white/[0.04] ring-1 ring-white/10 backdrop-blur-sm hover:bg-white/[0.08] hover:ring-white/20 transition-all duration-300 ease-smooth"
-              >
-                <span className="absolute top-7 md:top-8 right-7 md:right-8 text-xs font-display font-semibold text-slate-500">
-                  0{i + 1}
-                </span>
-                <span className="inline-flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-lg bg-brand-accent text-brand-ink">
-                  {Icon && <Icon className="w-7 h-7 md:w-8 md:h-8" strokeWidth={2} />}
-                </span>
-                <h3 className="mt-6 font-display font-semibold text-xl md:text-2xl text-white leading-snug">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm md:text-base text-slate-300 leading-relaxed">{item.body}</p>
+              <Reveal key={item.title} variant="up" delay={(i % 4) * 90} className="glow-card h-full">
+                <div className="glow-card-inner p-7 md:p-8 lg:p-9">
+                  <span className="absolute top-7 md:top-8 right-7 md:right-8 text-xs font-display font-semibold text-slate-500">
+                    0{i + 1}
+                  </span>
+                  <span className="inline-flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-lg bg-brand-accent text-brand-ink">
+                    {Icon && <Icon className="w-7 h-7 md:w-8 md:h-8" strokeWidth={2} />}
+                  </span>
+                  <h3 className="mt-6 font-display font-semibold text-xl md:text-2xl text-white leading-snug">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm md:text-base text-slate-300 leading-relaxed">{item.body}</p>
+                </div>
               </Reveal>
             )
           })}
