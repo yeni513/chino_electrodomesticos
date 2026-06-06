@@ -1,22 +1,22 @@
-// Wrapper para usar Supabase Image Transformation cuando aplique.
-// Si la URL no es de Supabase, se devuelve sin tocar.
+// Helpers de imagen.
+//
+// NOTA: la Image Transformation de Supabase (`/render/image/...`) es una función
+// de PAGO (Pro+). En el plan Free devuelve 403, lo que rompía TODAS las fotos de
+// producto. Por eso servimos la URL ORIGINAL (`/object/public/...`) tal cual.
+// Las fotos sembradas ya son webp pequeñas y las que se suben por el admin se
+// comprimen/reescalan a 1600px en el navegador antes de subir, así que no
+// necesitamos transformación del servidor.
+//
+// Si algún día se sube el proyecto a un plan Pro, se puede reactivar el
+// transform aquí sin tocar el resto del código.
 
-export function srcAt(url, { width, quality = 80 } = {}) {
-  if (!url) return url
-  if (typeof url !== 'string') return url
-  if (!url.includes('/storage/v1/object/public/')) return url
-
-  // Convierte /object/public/ → /render/image/public/ (Image Transformation)
-  const rendered = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
-  const u = new URL(rendered)
-  if (width) u.searchParams.set('width', String(width))
-  u.searchParams.set('quality', String(quality))
-  u.searchParams.set('resize', 'cover')
-  return u.toString()
+export function srcAt(url) {
+  if (!url || typeof url !== 'string') return url
+  return url
 }
 
-export function srcSetFor(url, widths = [320, 640, 960, 1280]) {
-  if (!url) return undefined
-  if (!url.includes('/storage/v1/object/public/')) return undefined
-  return widths.map((w) => `${srcAt(url, { width: w })} ${w}w`).join(', ')
+// Sin transformación no podemos generar variantes de tamaño server-side.
+// Devolvemos undefined para que el navegador use solo `src`.
+export function srcSetFor() {
+  return undefined
 }
