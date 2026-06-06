@@ -1,14 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Grid, ZoomIn, X, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react'
 import Container from '../layout/Container.jsx'
 import Reveal from '../ui/Reveal.jsx'
 import { whatsappUrl } from '../../lib/whatsapp.js'
+import { useProducts } from '../../supabase/useProducts.js'
+import { srcAt } from '../../lib/imgUrl.js'
+import { categorias } from '../../data/content.js'
 
-// Galería de fotos reales del catálogo (adaptación de gallery-grid-block).
-const IMAGES = [
+const CAT_LABEL = Object.fromEntries(categorias.map((c) => [c.id, c.label]))
+
+// Fotos curadas de respaldo (siempre válidas). Se combinan con las fotos
+// reales del inventario del admin (esas van primero cuando existen).
+const CURATED = [
   { src: '/products/refrigerador.webp', title: 'Refrigerador French Door', category: 'Refrigeradores' },
   { src: '/products/refrigerador-sxs.webp', title: 'Refrigerador Side by Side', category: 'Refrigeradores' },
+  { src: '/products/refrigerador-angle.webp', title: 'Refrigerador — interior', category: 'Refrigeradores' },
   { src: '/products/lavadora.webp', title: 'Lavadora carga frontal', category: 'Lavadoras' },
   { src: '/products/lavadora-top.webp', title: 'Lavadora carga superior', category: 'Lavadoras' },
   { src: '/products/secadora.webp', title: 'Secadora', category: 'Secadoras' },
@@ -18,18 +25,38 @@ const IMAGES = [
   { src: '/products/freezer.webp', title: 'Freezer vertical', category: 'Freezers' },
   { src: '/products/combo.webp', title: 'Combo apilable', category: 'Combos' },
   { src: '/products/combo-angle.webp', title: 'Combo — detalle', category: 'Combos' },
-  { src: '/products/refrigerador-angle.webp', title: 'Refrigerador — interior', category: 'Refrigeradores' },
 ]
 
-const CATEGORIES = ['Todos', ...Array.from(new Set(IMAGES.map((i) => i.category)))]
-
 export default function Galeria() {
+  const { products } = useProducts()
   const [filter, setFilter] = useState('Todos')
-  const [index, setIndex] = useState(null) // índice dentro de `filtered`
+  const [index, setIndex] = useState(null)
+  const [broken, setBroken] = useState(() => new Set())
 
-  const filtered = filter === 'Todos' ? IMAGES : IMAGES.filter((i) => i.category === filter)
+  // Fotos reales del admin (con imagen) + curadas de respaldo, sin las rotas.
+  const images = useMemo(() => {
+    const real = (products || [])
+      .filter((p) => p.image)
+      .map((p) => ({
+        src: srcAt(p.image, { width: 800 }),
+        title: p.name,
+        category: CAT_LABEL[p.category] || 'Otros',
+      }))
+    const seen = new Set()
+    return [...real, ...CURATED].filter((img) => {
+      if (broken.has(img.src) || seen.has(img.src)) return false
+      seen.add(img.src)
+      return true
+    })
+  }, [products, broken])
 
-  const open = index !== null
+  const categories = useMemo(
+    () => ['Todos', ...Array.from(new Set(images.map((i) => i.category)))],
+    [images],
+  )
+  const filtered = filter === 'Todos' ? images : images.filter((i) => i.category === filter)
+
+  const open = index !== null && filtered[index]
   const current = open ? filtered[index] : null
   const close = () => setIndex(null)
   const next = () => setIndex((i) => (i + 1) % filtered.length)
@@ -63,14 +90,14 @@ export default function Galeria() {
             Mira los equipos de cerca
           </h2>
           <p className="mt-5 text-lg md:text-xl text-slate-600 leading-relaxed">
-            Fotos reales del tipo de electrodomésticos que manejamos. Toca cualquiera para
-            verla en grande — y pídenos la del modelo exacto por WhatsApp.
+            Fotos reales de los electrodomésticos que manejamos. Toca cualquiera para verla
+            en grande — y pídenos la del modelo exacto por WhatsApp.
           </p>
         </Reveal>
 
         {/* Filtros */}
         <div className="mt-10 flex flex-wrap justify-center gap-2">
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat}
               type="button"
@@ -109,6 +136,7 @@ export default function Galeria() {
                 alt={img.title}
                 loading="lazy"
                 decoding="async"
+                onError={() => setBroken((prev) => new Set(prev).add(img.src))}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-brand-ink/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">

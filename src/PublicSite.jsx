@@ -8,15 +8,31 @@ import PorQueNosotros from './components/sections/PorQueNosotros.jsx'
 import ComoTrabajamos from './components/sections/ComoTrabajamos.jsx'
 import Marcas from './components/sections/Marcas.jsx'
 import Showcase from './components/sections/Showcase.jsx'
-import Galeria from './components/sections/Galeria.jsx'
 import CatalogoBand from './components/sections/CatalogoBand.jsx'
 import Location from './components/sections/Location.jsx'
 import Testimonios from './components/sections/Testimonios.jsx'
 import FAQ from './components/sections/FAQ.jsx'
 import CTAFinal from './components/sections/CTAFinal.jsx'
 
-// Destacados arrastra @supabase/supabase-js — lazy-load para sacarlo del bundle inicial.
+// Destacados y Galería arrastran @supabase/supabase-js (leen inventario del
+// admin) — lazy-load para sacar Supabase del bundle inicial.
 const Destacados = lazy(() => import('./components/sections/Destacados.jsx'))
+const Galeria = lazy(() => import('./components/sections/Galeria.jsx'))
+
+function GaleriaFallback() {
+  return (
+    <section id="galeria" className="section-y bg-white">
+      <div className="mx-auto w-full max-w-container px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="h-8 w-40 mx-auto rounded bg-slate-200/70 animate-pulse" />
+        <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <div key={i} className="aspect-square rounded-card bg-slate-100 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
 
 function DestacadosFallback() {
   return (
@@ -59,7 +75,9 @@ export default function PublicSite() {
           <Destacados />
         </Suspense>
         <Showcase />
-        <Galeria />
+        <Suspense fallback={<GaleriaFallback />}>
+          <Galeria />
+        </Suspense>
         <CatalogoBand />
         <ComoTrabajamos />
         <PorQueNosotros />
