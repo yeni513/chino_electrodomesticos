@@ -7,6 +7,7 @@ import {
   Filter,
   X,
   Archive,
+  FileBarChart,
 } from 'lucide-react'
 import AdminLayout from '../components/AdminLayout.jsx'
 import ProductList from '../components/ProductList.jsx'
@@ -21,6 +22,7 @@ import { supabase, PRODUCTS_TABLE } from '../../supabase/client.js'
 import { useToast } from '../lib/toast.jsx'
 import { deleteStorageObjectByPublicUrl } from '../lib/imageUtils.js'
 import { downloadCsv } from '../lib/csv.js'
+import { downloadInventoryReport } from '../lib/report.js'
 
 const CATEGORY_OPTIONS = [
   { value: 'all', label: 'Todas las categorías' },
@@ -332,6 +334,15 @@ export default function Dashboard() {
     toast.success('Inventario descargado en CSV')
   }
 
+  function exportReport() {
+    if (!rows || rows.length === 0) {
+      toast.info('No hay productos para el reporte')
+      return
+    }
+    downloadInventoryReport(rows)
+    toast.success('Reporte descargado', { description: 'Ábrelo en el navegador — incluye gráficos y fotos.' })
+  }
+
   const showFiltersChip = statusFilter !== 'all' || categoryFilter !== 'all' || search.trim() !== ''
 
   return (
@@ -358,11 +369,19 @@ export default function Dashboard() {
             <>
               <button
                 type="button"
+                onClick={exportReport}
+                className="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 rounded-lg bg-brand-ink text-white font-semibold text-sm hover:bg-slate-800 transition-colors"
+              >
+                <FileBarChart className="w-4 h-4" />
+                <span className="hidden sm:inline">Descargar reporte</span>
+              </button>
+              <button
+                type="button"
                 onClick={exportCsv}
                 className="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 rounded-lg ring-1 ring-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors"
               >
                 <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Exportar CSV</span>
+                <span className="hidden sm:inline">CSV</span>
               </button>
               <button
                 type="button"
