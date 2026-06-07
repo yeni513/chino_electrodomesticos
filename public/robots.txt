@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /admin/
 
-Sitemap: https://trusted-appliances.vercel.app/sitemap.xml
+Sitemap: https://chino-electrodomesticos.vercel.app/sitemap.xml

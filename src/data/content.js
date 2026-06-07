@@ -42,7 +42,7 @@ export const brand = {
 }
 
 // URL de producción. Cambiar al deployar al dominio final.
-export const siteUrl = 'https://trusted-appliances.vercel.app'
+export const siteUrl = 'https://chino-electrodomesticos.vercel.app'
 
 export const seo = {
   title: 'Trusted Appliances · Refrigeradores, lavadoras y estufas en Cleveland, OH',

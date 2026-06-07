@@ -87,7 +87,7 @@ export default function Showcase() {
           className="mt-2 md:mt-4 w-full max-w-5xl aspect-video object-contain"
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           poster="/showcase/exploded-poster.jpg"
           aria-label="Electrodoméstico que se arma y desarma al hacer scroll"
         >
