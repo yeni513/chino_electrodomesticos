@@ -3,7 +3,6 @@ import Header from './components/layout/Header.jsx'
 import Footer from './components/layout/Footer.jsx'
 import FloatingWhatsApp from './components/ui/FloatingWhatsApp.jsx'
 import Hero from './components/sections/Hero.jsx'
-import Categorias from './components/sections/Categorias.jsx'
 import PorQueNosotros from './components/sections/PorQueNosotros.jsx'
 import ComoTrabajamos from './components/sections/ComoTrabajamos.jsx'
 import Marcas from './components/sections/Marcas.jsx'
@@ -14,25 +13,9 @@ import Testimonios from './components/sections/Testimonios.jsx'
 import FAQ from './components/sections/FAQ.jsx'
 import CTAFinal from './components/sections/CTAFinal.jsx'
 
-// Destacados y Galería arrastran @supabase/supabase-js (leen inventario del
-// admin) — lazy-load para sacar Supabase del bundle inicial.
+// Destacados arrastra @supabase/supabase-js (lee inventario del admin) —
+// lazy-load para sacar Supabase del bundle inicial.
 const Destacados = lazy(() => import('./components/sections/Destacados.jsx'))
-const Galeria = lazy(() => import('./components/sections/Galeria.jsx'))
-
-function GaleriaFallback() {
-  return (
-    <section id="galeria" className="section-y bg-white">
-      <div className="mx-auto w-full max-w-container px-6 md:px-8 lg:px-12 xl:px-16">
-        <div className="h-8 w-40 mx-auto rounded bg-slate-200/70 animate-pulse" />
-        <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-            <div key={i} className="aspect-square rounded-card bg-slate-100 animate-pulse" />
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
 
 function DestacadosFallback() {
   return (
@@ -70,19 +53,15 @@ export default function PublicSite() {
       <main id="main" className="flex-1">
         <Hero />
         <Marcas />
-        <Categorias />
         <Suspense fallback={<DestacadosFallback />}>
           <Destacados />
         </Suspense>
         <Showcase />
-        <Suspense fallback={<GaleriaFallback />}>
-          <Galeria />
-        </Suspense>
+        <Testimonios />
         <ComoTrabajamos />
         <PorQueNosotros />
         <Location />
         <CatalogoBand />
-        <Testimonios />
         <FAQ />
         <CTAFinal />
       </main>

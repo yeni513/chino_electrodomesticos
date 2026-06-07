@@ -81,9 +81,9 @@ export const business = {
 }
 
 export const nav = [
-  { label: 'Catálogo', href: '#categorias' },
-  { label: 'Destacados', href: '#destacados' },
+  { label: 'Catálogo', href: '#destacados' },
   { label: 'Por qué nosotros', href: '#por-que' },
+  { label: 'Opiniones', href: '#testimonios' },
   { label: 'Tienda', href: '#visitanos' },
   { label: 'Preguntas', href: '#faq' },
 ]
@@ -403,9 +403,59 @@ export const marcas = [
   'KitchenAid',
 ]
 
-// Vacío hasta tener testimonios reales con nombre y ciudad. La sección
-// se oculta automáticamente cuando el array está vacío.
-export const testimonios = []
+// Testimonios de clientes. EJEMPLOS para la demo — reemplázalos por reseñas
+// reales (puedes pedirlas por WhatsApp). La sección se oculta sola si queda vacío.
+export const testimonios = [
+  {
+    name: 'María G.',
+    city: 'Cleveland, OH',
+    rating: 5,
+    quote:
+      'Compré una lavadora y me la entregaron el mismo día. Todo por WhatsApp, súper fácil y el precio fue justo. ¡Recomendados!',
+  },
+  {
+    name: 'Carlos R.',
+    city: 'Lakewood, OH',
+    rating: 5,
+    quote:
+      'Me mandaron fotos y video del refrigerador antes de comprarlo. Llegó impecable y a la hora que coordinamos.',
+  },
+  {
+    name: 'Jennifer M.',
+    city: 'Parma, OH',
+    rating: 5,
+    quote:
+      'Me ayudaron a elegir la estufa correcta para mi cocina. Muy honestos, sin presionar. Excelente atención.',
+  },
+  {
+    name: 'Luis A.',
+    city: 'Cleveland, OH',
+    rating: 5,
+    quote:
+      'Revisaron el equipo delante de mí al entregarlo. Se nota que les importa que el cliente quede contento.',
+  },
+  {
+    name: 'Robert T.',
+    city: 'Euclid, OH',
+    rating: 5,
+    quote:
+      'Fast delivery and great prices. They answered all my questions on WhatsApp. Highly recommend these guys.',
+  },
+  {
+    name: 'Ana P.',
+    city: 'Cleveland Hts, OH',
+    rating: 5,
+    quote:
+      'Precios mejores que las tiendas grandes y el trato es personal. Ya les compré dos veces, todo perfecto.',
+  },
+  {
+    name: 'Sofía V.',
+    city: 'Cleveland, OH',
+    rating: 5,
+    quote:
+      'La secadora funciona perfecta y me la coordinaron a la hora que pedí. Gracias por el buen servicio.',
+  },
+]
 
 export const faqs = [
   {

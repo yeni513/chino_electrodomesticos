@@ -87,7 +87,7 @@ export default function Hero() {
               return (
                 <a
                   key={chip.label}
-                  href="#categorias"
+                  href="#destacados"
                   className="group inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 ring-1 ring-white/20 backdrop-blur-sm hover:bg-white hover:text-brand-ink text-sm md:text-[0.95rem] font-medium text-white transition-colors"
                 >
                   {Icon && (
@@ -148,7 +148,7 @@ export default function Hero() {
 
       {/* Indicador de scroll */}
       <a
-        href="#categorias"
+        href="#destacados"
         aria-label="Ver catálogo"
         className="hidden md:flex absolute bottom-7 left-1/2 -translate-x-1/2 z-20 flex-col items-center gap-1.5 text-white/70 hover:text-white transition-colors"
       >
