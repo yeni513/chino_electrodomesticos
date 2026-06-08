@@ -191,28 +191,22 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   Carrusel diagonal (galería): filas que se deslizan en bucle infinito.
-   Cada fila duplica su contenido y se mueve -50% para un loop sin costura.
-   Direcciones alternas con .reverse. Pausa al pasar el mouse por el muro.
+   Marquee (marcas/logos): fila en bucle infinito. El contenido se duplica y se
+   traslada -50% para un loop sin costura. Velocidad vía --duration.
    ─────────────────────────────────────────────────────────────────────────── */
-@keyframes marquee-x {
+@keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
-.marquee-row {
-  display: flex;
-  width: max-content;
-  animation: marquee-x var(--dur, 55s) linear infinite;
+.animate-marquee {
+  animation: marquee var(--duration, 30s) linear infinite;
   will-change: transform;
 }
-.marquee-row.reverse {
+.animate-marquee-reverse {
   animation-direction: reverse;
 }
-.marquee-track:hover .marquee-row {
-  animation-play-state: paused;
-}
 @media (prefers-reduced-motion: reduce) {
-  .marquee-row { animation: none; }
+  .animate-marquee { animation: none; }
 }
 
 /* ImageTrail — imagen que aparece en el rastro del cursor y desaparece. */
